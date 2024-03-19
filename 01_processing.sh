@@ -1,20 +1,29 @@
 # in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/fastq_dl
 ## would be better with a conda env 
 
-conda create -n stacks -c bioconda stacks fastqc
-
-module load StdEnv/2020 stacks/2.64 
+conda create -n stacks -c bioconda stacks fastqc multiqc
 
 # process radtags
-mkdir process_fastq
-process_radtags -1 NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R1.fastq.gz -2 NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R2.fastq.gz -o process_fastq -b barcodes.txt -e apeKI -y fastq -r -c -q
-rm process_fastq/*.mem.*
+mkdir 01_process_fastq
+
+process_radtags -1 00_raw_fastq/NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R1.fastq.gz -2 00_raw_fastq/NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R2.fastq.gz -o 01_process_fastq -b barcodes.txt -e apeKI -y fastq -r -c -q
+#178395276 total sequences
+#    82910 barcode not found drops (0.0%)
+#   995028 low quality read drops (0.6%)
+#  1383657 RAD cutsite not found drops (0.8%)
+# 175933681 retained reads (98.6%)
+
+stacks-dist-extract --pretty 01_process_fastq/process_radtags.log per_barcode_raw_read_counts > 01_process_fastq/process.sum
+
+rm 01_process_fastq/*.rem.*
 
 # extract fastqc reports
-module load StdEnv/2023 fastqc/0.12.1
+mkdir -p 01_process_fastq/fastqc
 
-for file in process_fastq/*.1.fq
+for file in 01_process_fastq/*.fq
 do
-  fastqc $file.1.fq -o demulti/fastqc
-  fastqc $file.2.fq -o demulti/fastqc
+  fastqc $file -o 01_process_fastq/fastqc
 done
+
+multiqc 01_process_fastq/fastqc
+
