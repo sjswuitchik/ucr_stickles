@@ -1,7 +1,7 @@
 # QTL mapping of kinematics in Threespine Stickleback (_Gasterosteus aculeatus_)
 This repository contains the code and associated data access for a collaboration between University of California Riverside, University of Calgary,  Bamfield Marine Sciences Centre, and Mount Royal University on the genetic basis of kinematics and morphometrics of threespine stickleback. 
 
-Associated Investigators 
+Associated Investigators: 
 
 Seth Shirazi (Ph.D. candidate, University of California Riverside)
 
