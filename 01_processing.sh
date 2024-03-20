@@ -45,3 +45,13 @@ while read file
 do
   bwa mem -t 16 ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_process_fastq/filtered/$file.1.1.fq 01_process_fastq/filtered/$file.1.2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_process_fastq/samples
+
+# remove ambiguous reads & created sorted BAMs
+cd 02_align
+ls *.sam | sed '/\.sam/s///' > samples
+
+while read file 
+do
+  samtools view -q 20 -b -S $file > $file.bam
+  samtools sort $file.bam - o $file.sort.bam
+done < samples
