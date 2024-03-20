@@ -31,6 +31,13 @@ cd 01_process_fastq
 ls *.1.fq | sed '/\.1\.fq/s///' > samples
 while read file
 do
-  clone_filter -1 $file.1.fq -2 $file.1.fq -i fastq -D >> $file.log
+  clone_filter -1 $file.1.fq -2 $file.1.fq -i fastq -D -o filtered >> $file.log
 done < samples 
 
+cd ..
+
+# align to reference genome
+while read file
+do
+  bwa mem -t 16 ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_process_fastq/filtered/$file.1.1.fq 01_process_fastq/filtered/$file.1.2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
+done < 01_process_fastq/samples
