@@ -27,3 +27,11 @@ done
 
 multiqc 01_process_fastq/fastqc
 
+# remove PCR duplicates
+cd 01_process_fastq
+ls *.1.fq | sed '/\.1\.fq/s///' > samples
+while read file
+do
+  clone_filter -1 $file.1.fq -2 $file.1.fq -i fastq -D >> $file.log
+done < samples 
+
