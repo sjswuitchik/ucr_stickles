@@ -1,4 +1,4 @@
-# in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/fastq_dl
+# in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data
 
 conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools
 
