@@ -7,3 +7,9 @@ datasets download genome accession GCF_016920845.1 --include gff3,genome,seq-rep
 unzip ncbi_dataset.zip
 mv ncbi_dataset/data/* .
 rm -r *.zip ncbi_dataset *.json*
+
+conda deactivate
+conda activate stacks
+conda update samtools --force-reinstall # issue with libcrypto
+
+samtools faidx GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna
