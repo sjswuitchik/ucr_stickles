@@ -1,5 +1,4 @@
 # in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/fastq_dl
-## would be better with a conda env 
 
 conda create -n stacks -c bioconda stacks fastqc multiqc
 
