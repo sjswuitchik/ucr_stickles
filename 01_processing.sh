@@ -55,12 +55,11 @@ do
   samtools sort $file.bam - o $file.sort.bam
 done < samples
 
-# Call variants in samtools
+# Call variants & generate VCF
 ls *.sort.bam | sed '/\.sort\.bam///' > bamList 
 
-samtools mpileup -C 50 -E -t SP -t DP -u -I -f ../../reference/
-
-samtools mpileup -C 50 -E -t SP -t DP -u -I -f /sf1/project/xpa-194-aa/stickl_genome/stickl_genome85/stickl_samtools/Gasterosteus_aculeatus.BROADS1.dna.toplevel.fa -b bam_list.txt > Lib01.bcf
+samtools mpileup -C 50 -E -t SP -t DP -u -I -f ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList > stickles_ucr.bcf
+bcftools call -v -c -f GQ stickles_ucr.bcf > stickles_ucr.vcf
 
 
 
