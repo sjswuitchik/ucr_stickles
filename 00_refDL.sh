@@ -9,6 +9,7 @@ mv ncbi_dataset/data/* .
 rm -r *.zip ncbi_dataset *.json*
 
 conda deactivate
+#conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools (also outlined in 01_processing.sh)
 conda activate stacks
 
 bwa index GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna
