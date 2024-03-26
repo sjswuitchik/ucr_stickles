@@ -3,8 +3,8 @@
 #SBATCH -o 02_align/out
 #SBATCH -e 02_align/err
 #SBATCH -n 1
-#SBATCH --mem 7000
-#SBATCH -t 03:00:00
+#SBATCH --mem 8000
+#SBATCH -t 15:00:00
 
 # submit from ~/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data
 
