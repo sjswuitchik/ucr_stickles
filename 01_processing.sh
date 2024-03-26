@@ -1,6 +1,6 @@
 # in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data
 
-conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools
+conda create -n stacks -c bioconda stacks fastqc multiqc bwa bcftools
 
 # process radtags
 mkdir 01_process_fastq
@@ -47,8 +47,21 @@ sbatch --account=def-sjsmith run_align.sh
 cd 02_align
 ls *.sam | sed '/\.sam/s///' > samples
 
+module load samtools # conflicts in conda build 
+
 while read file 
 do
   samtools view -q 20 -b -S $file > $file.bam
   samtools sort $file.bam - o $file.sort.bam
 done < samples
+
+# Call variants in samtools
+ls *.sort.bam | sed '/\.sort\.bam///' > bamList 
+
+samtools mpileup -C 50 -E -t SP -t DP -u -I -f ../../reference/
+
+samtools mpileup -C 50 -E -t SP -t DP -u -I -f /sf1/project/xpa-194-aa/stickl_genome/stickl_genome85/stickl_samtools/Gasterosteus_aculeatus.BROADS1.dna.toplevel.fa -b bam_list.txt > Lib01.bcf
+
+
+
+
