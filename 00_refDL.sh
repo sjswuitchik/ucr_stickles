@@ -9,6 +9,6 @@ mv ncbi_dataset/data/* .
 rm -r *.zip ncbi_dataset *.json*
 
 conda deactivate
-module load samtools/1.18
+conda activate stacks
 
-samtools faidx GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna
+bwa index GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna
