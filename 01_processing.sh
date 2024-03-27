@@ -51,7 +51,7 @@ module load samtools # conflicts in conda build
 
 while read file 
 do
-  samtools view -q 20 -b -S $file > $file.bam
+  samtools view -q 20 -b -S $file.sam > $file.bam
   samtools sort $file.bam - o $file.sort.bam
 done < samples
 
