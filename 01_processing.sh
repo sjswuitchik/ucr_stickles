@@ -56,7 +56,7 @@ do
 done < samples
 
 # Call variants & generate VCF
-ls *.sort.bam | sed '/\.sort\.bam///' > bamList 
+ls *.sort.bam | sed '/\.sort\.bam/s//' > bamList 
 
 samtools mpileup -C 50 -E -t SP -t DP -u -I -f ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList > stickles_ucr.bcf
 bcftools call -v -c -f GQ stickles_ucr.bcf > stickles_ucr.vcf
