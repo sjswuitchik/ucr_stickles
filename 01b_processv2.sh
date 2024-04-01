@@ -58,7 +58,7 @@ ls *.sam | sed '/\.sam/s///' > samples
 
 while read file
 do
-  samtools view -Sbt ../../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 02_align/$file.sam | samtools flagstat - > $file.aln.log
+  samtools view -Sbt ../../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna $file.sam | samtools flagstat - > $file.aln.log
 done < samples
 
 # convert SAM to BAM, sort, & index  
