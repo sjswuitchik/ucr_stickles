@@ -1,8 +1,6 @@
 # from /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data/runv2
 ## testing if issues with initial processing
 
-conda create -n ddocent -c bioconda ddocent # in case I decide to use dDocent
-
 conda activate stacks
 mkdir 01_demulti
 
