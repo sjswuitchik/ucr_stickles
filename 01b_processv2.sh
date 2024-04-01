@@ -80,7 +80,7 @@ done
 while read file
 do
   samtools coverage --output $file.cov.txt $file.sort.bam
-  samtools flagstat -O tsv $file.sort.bam > $file.sort.aln.stat
+  samtools flagstat -O tsv $file.markdup.bam > $file.markdup.aln.stat
 done < 02_align/samples
 
 
