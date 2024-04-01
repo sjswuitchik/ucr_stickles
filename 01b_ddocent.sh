@@ -31,3 +31,10 @@ while read file
 do
   clone_filter -1 $file.1.fq -2 $file.2.fq -i fastq -D -o filtered >> $file.log
 done < samples 
+
+## fastp
+
+cd ..
+mkdir 02_align
+sbatch --account=def-sjsmith run_align_v2.sh
+
