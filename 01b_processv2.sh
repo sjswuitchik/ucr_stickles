@@ -58,7 +58,7 @@ ls *.sam | sed '/\.sam/s///' > samples
 
 while read file
 do
-  samtools -view Sbt ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 02_align/$file.sam | samtools flagstat - 
+  samtools view -Sbt ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 02_align/$file.sam | samtools flagstat - > $file.aln.log
 done < 02_align/samples
 
 # convert SAM to BAM, sort, & index  
@@ -67,20 +67,20 @@ while read file
 do
   samtools view -q 20 -b -S $file.sam > $file.bam
   samtools sort $file.bam -o $file.sort.bam
-  samtools index $file.bam -o $file.sort.index
+  samtools index $file.bam -o $file.sort.idx
 done < samples
 
 # mark dups
 while read file
 do
-  sambamba markup $file.sort.bam $file.dups
+  sambamba markdup $file.sort.bam $file.markdup.bam
 done
 
 # QC & filtering
 while read file
 do
-  samtools coverage --output $file.txt $file.sort.bam
-  samtools flagstat -O tsv $file.sort.bam > $file.aln.stat
+  samtools coverage --output $file.cov.txt $file.sort.bam
+  samtools flagstat -O tsv $file.sort.bam > $file.sort.aln.stat
 done < 02_align/samples
 
 
