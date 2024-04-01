@@ -71,6 +71,9 @@ do
 done < samples
 
 # mark dups
+conda deactivate 
+conda activate gatk
+
 while read file
 do
   sambamba markdup $file.sort.bam $file.markdup.bam
