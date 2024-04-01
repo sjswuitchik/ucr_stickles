@@ -31,7 +31,7 @@ do
   fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq.gz --out2 trimmed/$file.R2.fq.gz -q 15 -u 50 -t 1 -T 1 -c -z --dedup -h fastP_out/$file.fp.html &> fastP_out/$file.fp.trim.log
 done < samples
 
-## double check these names after fastp is done
+## NTS: double check these names after fastp is done
 while read file
 do
   clone_filter -1 trimmed/$file.R1.fq.gz -2 trimmed/$file.R2.fq.gz -i gzfastq -D -o trimmed/filtered >> $file.log
@@ -39,5 +39,9 @@ done < samples
 
 cd ..
 mkdir 02_align
-sbatch --account=def-sjsmith run_align_v2.sh
 
+## NTS: check the file extensions after clone_filter before running. 
+while read file
+do
+  bwa mem -O 5 -B 3 -a -M -R ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/filtered/$file.1.1.fq 01_demulti/trimmed/filtered/$file.1.2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
+done < 01_demulti/samples
