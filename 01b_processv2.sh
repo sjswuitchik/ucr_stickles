@@ -18,21 +18,24 @@ for file in 01_demulti/*.fq
 do
   fastqc $file -o 01_demulti/fastqc
 done
-
 multiqc 01_demulti/fastqc
+
+mv multiqc_data/ multiqc_data_demulti/
+mv multiqc_report.html multiqc_report_demulti.html
 
 cd 01_demulti
 ls *.1.fq | sed '/\.1\.fq/s///' > samples
 mkdir -p trimmed/filtered
+mkdir -p trimmed/fastP_out
 
 while read file
 do
-  fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq.gz --out2 trimmed/$file.R2.fq.gz -q 15 -u 50 -t 1 -T 1 -c -z 4 --dedup -h fastP_out/$file.fp.html
+  fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq --out2 trimmed/$file.R2.fq -q 15 -u 50 -t 1 -T 1 -c --dedup -h fastP_out/$file.fp.html
 done < samples
 
 while read file
 do
-  clone_filter -1 trimmed/$file.R1.fq.gz -2 trimmed/$file.R2.fq.gz -i gzfastq -D -o trimmed/filtered >> $file.log
+  clone_filter -1 trimmed/$file.R1.fq -2 trimmed/$file.R2.fq -i fastq -D -o trimmed/filtered >> $file.log
 done < samples 
 
 mkdir -p trimmed/filtered/fastqc
@@ -41,6 +44,9 @@ do
   fastqc $file -o trimmed/filtered/fastqc
 done
 multiqc trimmed/filtered/fastqc
+
+mv multiqc_data/ multiqc_data_filtered/
+mv multiqc_report.html multiqc_report_filtered.html
 
 cd ..
 mkdir 02_align
