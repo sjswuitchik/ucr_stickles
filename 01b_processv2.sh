@@ -1,7 +1,10 @@
 # from /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data/runv2
 ## testing if issues with initial processing
 
-conda activate stacks
+conda activate fastq2vcf
+module load samtools # conda conflicts
+
+## Process FASTQs with STACKS
 mkdir 01_demulti
 
 process_radtags -1 ../00_raw_fastq/NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R1.fastq.gz -2 ../00_raw_fastq/NS.LH00147_0009.006.B723---B503.THigham_20230515_plate1_R2.fastq.gz -o 01_demulti -i gzfastq -b barcodes.txt -e apeKI -y fastq -r 
@@ -13,6 +16,7 @@ process_radtags -1 ../00_raw_fastq/NS.LH00147_0009.006.B723---B503.THigham_20230
 
 rm *rem*
 
+# QC
 mkdir 01_demulti/fastqc
 for file in 01_demulti/*.fq
 do
@@ -23,6 +27,7 @@ multiqc 01_demulti/fastqc
 mv multiqc_data/ multiqc_data_demulti/
 mv multiqc_report.html multiqc_report_demulti.html
 
+## Trim adapters with FastP
 cd 01_demulti
 ls *.1.fq | sed '/\.1\.fq/s///' > samples
 mkdir -p trimmed/fastP_out
@@ -32,6 +37,7 @@ do
   fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq --out2 trimmed/$file.R2.fq -q 15 -u 50 -t 1 -T 1 -c --dedup -h fastP_out/$file.fp.html
 done < samples
 
+# QC
 mkdir -p trimmed/fastqc
 cd ..
 
@@ -44,7 +50,7 @@ multiqc 01_demulti/trimmed/fastqc
 mv multiqc_data/ multiqc_data_filtered/
 mv multiqc_report.html multiqc_report_filtered.html
 
-# align reads to ref
+## Align reads to reference genome with BWA
 mkdir 02_align
 
 while read file
@@ -52,7 +58,7 @@ do
   bwa mem -O 5 -B 3 -a -M -t 16 ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_demulti/samples
 
-# check alignment stats 
+# QC
 cd 02_align
 ls *.sam | sed '/\.sam/s///' > samples
 
@@ -61,7 +67,7 @@ do
   samtools view -Sbt ../../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna $file.sam | samtools flagstat - > $file.aln.log
 done < samples
 
-# convert SAM to BAM, sort, & index  
+## Convert SAM to BAM, sort, & index  
 
 while read file 
 do
@@ -70,10 +76,7 @@ do
   samtools index $file.sort.bam -o $file.sort.idx
 done < samples
 
-# mark dups
-conda deactivate 
-conda activate gatk
-
+## Mark duplicates
 while read file
 do
   sambamba markdup $file.sort.bam $file.markdup.bam
@@ -86,7 +89,7 @@ do
   samtools flagstat -O tsv $file.markdup.bam > $file.markdup.aln.stat
 done < samples
 
-# Call variants & generate VCF 
+## Call variants & generate VCF with BCFtools
 ls *.markdup.bam > bamList 
 cd ..
 mkdir 03_vcf
