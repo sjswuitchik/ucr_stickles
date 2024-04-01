@@ -25,7 +25,6 @@ mv multiqc_report.html multiqc_report_demulti.html
 
 cd 01_demulti
 ls *.1.fq | sed '/\.1\.fq/s///' > samples
-mkdir -p trimmed/filtered
 mkdir -p trimmed/fastP_out
 
 while read file
@@ -33,17 +32,17 @@ do
   fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq --out2 trimmed/$file.R2.fq -q 15 -u 50 -t 1 -T 1 -c --dedup -h fastP_out/$file.fp.html
 done < samples
 
-while read file
-do
-  clone_filter -1 trimmed/$file.R1.fq -2 trimmed/$file.R2.fq -i fastq -D -o trimmed/filtered >> $file.log
-done < samples 
+#while read file
+#do
+#  clone_filter -1 trimmed/$file.R1.fq -2 trimmed/$file.R2.fq -i fastq -D -o trimmed/filtered >> $file.log
+#done < samples 
 
-mkdir -p trimmed/filtered/fastqc
-for file in trimmed/filtered/*.fq.gz
+mkdir -p trimmed/fastqc
+for file in trimmed/*.fq
 do
-  fastqc $file -o trimmed/filtered/fastqc
+  fastqc $file -o trimmed/fastqc
 done
-multiqc trimmed/filtered/fastqc
+multiqc trimmed/fastqc
 
 mv multiqc_data/ multiqc_data_filtered/
 mv multiqc_report.html multiqc_report_filtered.html
@@ -54,7 +53,7 @@ mkdir 02_align
 ## NTS: check the file extensions after clone_filter before running. 
 while read file
 do
-  bwa mem -O 5 -B 3 -a -M -R ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/filtered/$file.1.1.fq 01_demulti/trimmed/filtered/$file.1.2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
+  bwa mem -O 5 -B 3 -a -M -R ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_demulti/samples
 
 # check alignment stats 
