@@ -61,7 +61,7 @@ do
   samtools -view Sbt ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 02_align/$file.sam | samtools flagstat - 
 done < 02_align/samples
 
-# convert SAM to BAM, & sort 
+# convert SAM to BAM, sort, & index  
 
 while read file 
 do
@@ -70,7 +70,14 @@ do
   samtools index $file.bam -o $file.sort.index
 done < samples
 
-# calculate coverage 
+# calculate coverage
+mkdir coverage
+cd ..
+while read file
+do
+  bedtools coverage -a ../../reference/GCF_016920845.1/stickle.gff -b $file.sort.bam -sorted -d > coverage/$file.cov.txt
+done < 02_align/samples
+
 
 
 
