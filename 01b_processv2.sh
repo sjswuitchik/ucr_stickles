@@ -23,8 +23,7 @@ multiqc 01_demulti/fastqc
 
 cd 01_demulti
 ls *.1.fq | sed '/\.1\.fq/s///' > samples
-mkdir -p trimmed/fastP_out
-mkdir trimmed/filtered
+mkdir -p trimmed/filtered
 
 while read file
 do
