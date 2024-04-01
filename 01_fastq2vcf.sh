@@ -1,5 +1,4 @@
-# from /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data/runv2
-## testing if issues with initial processing
+# from /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data/
 
 conda activate fastq2vcf
 module load samtools # conda conflicts
