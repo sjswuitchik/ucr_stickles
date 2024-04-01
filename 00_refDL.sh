@@ -7,6 +7,7 @@ datasets download genome accession GCF_016920845.1 --include gff3,genome,seq-rep
 unzip ncbi_dataset.zip
 mv ncbi_dataset/data/* .
 rm -r *.zip ncbi_dataset *.json*
+mv GCF_016920845.1/genomic.gff GCF_016920845.1/stickle.gff
 
 conda deactivate
 #conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools (also outlined in 01_processing.sh)
