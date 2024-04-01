@@ -70,13 +70,19 @@ do
   samtools index $file.bam -o $file.sort.index
 done < samples
 
-# calculate coverage
-mkdir coverage
-cd ..
+# mark dups
+for file in 02_align/*.bam;
+do
+  sambamba markup $file 
+done
+
+# QC & filtering
 while read file
 do
-  bedtools coverage -a ../../reference/GCF_016920845.1/stickle.gff -b $file.sort.bam -sorted -d > coverage/$file.cov.txt
+  samtools coverage --output $file $file.sort.bam
+  samtools flagstat -O tsv $file.sort.bam > $file.aln.stat
 done < 02_align/samples
+
 
 
 
