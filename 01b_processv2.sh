@@ -49,7 +49,7 @@ mkdir 02_align
 
 while read file
 do
-  bwa mem -O 5 -B 3 -a -M -t 16 -R ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
+  bwa mem -O 5 -B 3 -a -M -t 16 ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_demulti/samples
 
 # check alignment stats 
