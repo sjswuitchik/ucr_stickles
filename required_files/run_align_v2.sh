@@ -7,6 +7,7 @@
 #SBATCH -t 24:00:00
 
 # submit from ~/projects/def-sjsmith/sjsmith/stickles_ucr/seq_data/runv2
+### edit this before pulling to cluster
 
 module load bwa
 
