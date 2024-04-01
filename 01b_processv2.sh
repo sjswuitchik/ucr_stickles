@@ -82,7 +82,7 @@ done < samples
 # QC & filtering
 while read file
 do
-  samtools coverage --output $file.cov.txt $file.sort.bam
+  samtools coverage --output $file.cov.txt $file.markdup.bam
   samtools flagstat -O tsv $file.markdup.bam > $file.markdup.aln.stat
 done < samples
 
