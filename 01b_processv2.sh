@@ -31,6 +31,7 @@ do
   fastp --in1 $file.1.fq --in2 $file.2.fq --out1 trimmed/$file.R1.fq.gz --out2 trimmed/$file.R2.fq.gz -q 15 -u 50 -t 1 -T 1 -c -z --dedup -h fastP_out/$file.fp.html &> fastP_out/$file.fp.trim.log
 done < samples
 
+## double check these names after fastp is done
 while read file
 do
   clone_filter -1 trimmed/$file.R1.fq.gz -2 trimmed/$file.R2.fq.gz -i gzfastq -D -o trimmed/filtered >> $file.log
