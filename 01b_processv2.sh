@@ -71,9 +71,9 @@ do
 done < samples
 
 # mark dups
-for file in 02_align/*.bam;
+while read file
 do
-  sambamba markup $file 
+  sambamba markup $file.sort.bam $file.dups
 done
 
 # QC & filtering
