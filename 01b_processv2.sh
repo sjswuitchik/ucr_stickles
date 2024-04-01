@@ -45,3 +45,31 @@ while read file
 do
   bwa mem -O 5 -B 3 -a -M -R ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/filtered/$file.1.1.fq 01_demulti/trimmed/filtered/$file.1.2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_demulti/samples
+
+# check alignment stats 
+cd 02_align
+ls *.sam | sed '/\.sam/s///' > samples
+
+while read file
+do
+  samtools -view Sbt ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 02_align/$file.sam | samtools flagstat - 
+done < 02_align/samples
+
+# convert SAM to BAM, & sort 
+
+while read file 
+do
+  samtools view -q 20 -b -S $file.sam > $file.bam
+  samtools sort $file.bam -o $file.sort.bam
+  samtools index $file.bam -o $file.sort.index
+done < samples
+
+# calculate coverage 
+
+
+
+
+
+
+
+
