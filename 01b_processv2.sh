@@ -37,6 +37,13 @@ do
   clone_filter -1 trimmed/$file.R1.fq.gz -2 trimmed/$file.R2.fq.gz -i gzfastq -D -o trimmed/filtered >> $file.log
 done < samples 
 
+mkdir -p trimmed/filtered/fastqc
+for file in trimmed/filtered/*.fq.gz
+do
+  fastqc $file -o trimmed/filtered/fastqc
+done
+multiqc trimmed/filtered/fastqc
+
 cd ..
 mkdir 02_align
 
