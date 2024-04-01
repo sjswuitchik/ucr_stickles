@@ -79,7 +79,7 @@ done
 # QC & filtering
 while read file
 do
-  samtools coverage --output $file $file.sort.bam
+  samtools coverage --output $file.txt $file.sort.bam
   samtools flagstat -O tsv $file.sort.bam > $file.aln.stat
 done < 02_align/samples
 
