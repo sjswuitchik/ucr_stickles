@@ -91,8 +91,9 @@ done < samples
 ls *.markdup.bam > bamList 
 cd ..
 mkdir 03_vcf
+cd 02_align
 
-bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b 02_align/bamList -O u > 03_vcf/stickles_ucr.bcf
+bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList -O u > ../03_vcf/stickles_ucr.bcf
 bcftools call -v -c -f GQ 03_vcf/stickles_ucr.bcf > 03_vcf/stickles_ucr.vcf
 
 
