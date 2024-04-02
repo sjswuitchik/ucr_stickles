@@ -72,7 +72,7 @@ while read file
 do
   samtools view -q 20 -b -S $file.sam > $file.bam
   samtools sort $file.bam -o $file.sort.bam
-  samtools index $file.sort.bam -o $file.sort.idx
+  samtools index $file.sort.bam $file.sort.idx
 done < samples
 
 ## Mark duplicates
