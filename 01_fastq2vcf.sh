@@ -54,7 +54,7 @@ mkdir 02_align
 
 while read file
 do
-  bwa mem -O 5 -B 3 -a -M -t 16 ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
+  bwa mem -O 5 -B 3 -a -M -t 16 ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna 01_demulti/trimmed/$file.R1.fq 01_demulti/trimmed/$file.R2.fq > 02_align/$file.sam 2> 02_align/$file.bwa.log
 done < 01_demulti/samples
 
 # QC
@@ -63,7 +63,7 @@ ls *.sam | sed '/\.sam/s///' > samples
 
 while read file
 do
-  samtools view -Sbt ../../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna $file.sam | samtools flagstat - > $file.aln.log
+  samtools view -Sbt ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna $file.sam | samtools flagstat - > $file.aln.log
 done < samples
 
 ## Convert SAM to BAM, sort, & index  
@@ -93,7 +93,7 @@ ls *.markdup.bam > bamList
 cd ..
 mkdir 03_vcf
 
-bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList -O u > 03_vcf/stickles_ucr.bcf
+bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList -O u > 03_vcf/stickles_ucr.bcf
 bcftools call -v -c -f GQ 03_vcf/stickles_ucr.bcf > 03_vcf/stickles_ucr.vcf
 
 
