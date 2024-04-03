@@ -14,13 +14,12 @@ done < samples
 # QC & filtering
 while read file
 do
-  samtools flagstat dedup/$file.dedup.bam > $file.dedup.aln.stat
+  samtools flagstat dedup/$file.dedup.bam > dedup/$file.dedup.aln.stat
 done < samples
 
 ## Call variants & generate VCF with BCFtools
-ls *.dedup.bam > bamList 
-cd ..
-mkdir 03_vcf
+ls dedup/*.dedup.bam > dedup/bamList 
+mkdir -p dedup/03_vcf
 
-bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b bamList -O u > 03_vcf/stickles_ucr.dedup.bcf
-bcftools call -v -c -f GQ 03_vcf/stickles_ucr.dedup.bcf > 03_vcf/stickles_ucr.dedup.vcf
+bcftools mpileup -C 50 -E -I --max-depth 8000 -f ../../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna -b dedup/bamList -O u > dedup/03_vcf/stickles_ucr.dedup.bcf
+bcftools call -v -c -f GQ dedup/03_vcf/stickles_ucr.dedup.bcf > dedup/03_vcf/stickles_ucr.dedup.vcf
