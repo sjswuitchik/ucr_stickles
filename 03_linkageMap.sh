@@ -16,11 +16,6 @@ unzip snpEff_latest_core.zip
 rm snpEff_latest_core.zip
 mkdir -p snpEff/data/gasAcu
 
-# create a PLINK env to generate IBD stats for manaul clustering 
-conda create -n plink -c bioconda plink
-conda activate plink
-
-cp seq_data/02_align/dedup/03_vcf/stickles_ucr.dedup.vcf linkageMapping/
 
 
 
