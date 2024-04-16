@@ -26,5 +26,9 @@ mv out.* stickles.filt* int_filt
 tar zcvf int_filt.tar.gz int_filt/
 rm -r int_filt/
 
-bgzip stickles.filtered.recode.vcf -c > stickles.filt.vcf.gz
-tabix -p vcf stickles.filt.vcf.gz
+# create 012 matrix for pedigree estimation
+vcftools --vcf stickles.filtered.recode.vcf --012 --out stickles.filtered
+
+## calculate IBD in PLINK for pedigree determination
+#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --recode --out test
+#plink --file test --allow-extra-chr --genome --out test2
