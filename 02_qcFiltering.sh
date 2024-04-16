@@ -18,8 +18,10 @@ vcftools --vcf stickles.filt2.recode.vcf --missing-indv
 # no one to remove
 vcftools --vcf stickles.filt2.recode.vcf --remove-indels --min-alleles 2 --max-alleles 2 --max-missing 0.75 --minDP 3 --recode --recode-INFO-all --out stickles.filt3
 # kept 470374/470374
-vcftools --vcf stickles.filt3.recode.vcf --maf 0.01 --max-meanDP 200 --recode --recode-INFO-all --out stickles.filtered
-#final checks; kept 470374/470374 sites, 60/60 indv
+vcftools --vcf stickles.filt3.recode.vcf --maf 0.01 --minGQ 10 --max-meanDP 200 --recode --recode-INFO-all --out stickles.filt4
+# kept 453918/470374 sites
+vcftools --vcf stickles.filt4.recode.vcf --remove-indels --min-alleles 2 --max-alleles 2 --max-missing 0.75 --maf 0.01 --minDP 3 --minGQ 10 --recode --recode-INFO-all --out stickles.filtered
+# final step; kept 16466/470374 sites
 
 mkdir int_filt
 mv out.* stickles.filt* int_filt
