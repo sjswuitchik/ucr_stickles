@@ -11,6 +11,19 @@ library(tidyverse)
 
 df <- read_delim("stickles.filtered.012", delim = '\t', col_names = "num")
 indv <- read_delim("stickles.filtered.012.indv.join", delim = '\t', col_names = c("num", "id"))
-clean <- left_join(indv, df, by = 'num') %>%
-  select(-c(num))
-clean[ clean == -1 ] <- -9
+join <- left_join(indv, df, by = 'num') %>%
+  select(-c(num)) %>%
+  remove_rownames %>% 
+  column_to_rownames(var="id")
+# replace -1 from vcftools with -9 for sequoia 
+join[ join == -1 ] <- -9
+
+clean <- as.matrix(join)
+
+# read in life history data - read_delim was being a bit weird so use read.delim instead
+lh.df <- read.delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/lh.df.tsv", sep = '\t') 
+
+# run parental assignment 
+par.out <- sequoia(GenoM = clean,
+                  LifeHistData = lh.df,
+                  Module = 'ped')
