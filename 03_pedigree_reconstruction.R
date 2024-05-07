@@ -32,10 +32,10 @@ indv <- read_delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stick
 
 ## write out 012 matrix for SNPrune
 #prune <- left_join(indv, df, by = 'num') %>%
-  select(-c(num)) %>%
-  filter(id != 'dedup/BAM_11.dedup.bam') %>% #low mappability
-  filter(id != 'dedup/OBBB_1.dedup.bam') %>% # f1
-  filter(id != 'dedup/OOB_1.dedup.bam')      # f1
+#  select(-c(num)) %>%
+#  filter(id != 'dedup/BAM_11.dedup.bam') %>% #low mappability
+#  filter(id != 'dedup/OBBB_1.dedup.bam') %>% # f1
+# filter(id != 'dedup/OOB_1.dedup.bam')      # f1
 
 # replace -1 from vcftools with -9 
 #prune[ prune == -1 ] <- -9
