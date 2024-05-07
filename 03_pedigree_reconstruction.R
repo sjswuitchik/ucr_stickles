@@ -1,10 +1,23 @@
-## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
+## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/colony
+# download COLONY for Linux from https://www.zsl.org/about-zsl/resources/software/colony and transfer files to working dir
 
 conda activate vcfFilt
 vcftools --vcf stickles.filtered.recode.vcf --maf 0.02 --mac 4 --max-missing 1 --recode --recode-INFO-all --out stickles.prune
 ## kept 60/60 indv, 124/16466 sites
 vcftools --vcf stickles.prune.recode.vcf --012 --out stickles.filtered
 # transfer 012 files to local machine to add 0-59 as first field of indv - saved as stickles.filtered.012.indv.join
+
+
+
+#######################################
+# stuff that hasn't worked but I'm not ready to throw away yet 
+
+## calculate IBD in PLINK for pedigree determination
+#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --recode --out test
+#plink --file test --allow-extra-chr --genome --out test2
+
+#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --set-all-var-ids --recode --out stickles.plink
+#plink --file stickles.plink --allow-extra-chr --indep-pairwise 100000 50000 0.5 --out stickles.plink
 
 ####### if doing on Cedar 
 #conda create -n rv4 -c conda-forge r-base=4.3.3
@@ -31,21 +44,6 @@ write_delim(prune, "~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stick
 ####
 # sftp stickles.012matrix.txt to Cedar in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
 
-git clone https://github.com/mariocalus/SNPrune.git
-cd SNPrune
-chmod +x SNPrune
-./SNPrune
-
-
-
-##############################
-
-## calculate IBD in PLINK for pedigree determination
-#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --recode --out test
-#plink --file test --allow-extra-chr --genome --out test2
-
-#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --set-all-var-ids --recode --out stickles.plink
-#plink --file stickles.plink --allow-extra-chr --indep-pairwise 100000 50000 0.5 --out stickles.plink
 
 
 
