@@ -1,5 +1,5 @@
 ## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
-# transfer 012 matrix indv to local machine to add 0-59 as first field
+# transfer 012 matrix indv to local machine to add 0-59 as first field - saved as stickles.filtered.012.indv.join
 
 ## if doing on Cedar 
 #conda create -n rv4 -c conda-forge r-base=4.3.3
