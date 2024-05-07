@@ -6,24 +6,20 @@
 #conda activate rv4
 #R
 
-library(sequoia) 
 library(tidyverse)
 
-df <- read_delim("stickles.filtered.012", delim = '\t', col_names = "num")
-indv <- read_delim("stickles.filtered.012.indv.join", delim = '\t', col_names = c("num", "id"))
-join <- left_join(indv, df, by = 'num') %>%
+## load in data to create genotype 012 matrix
+df <- read_delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.filtered.012", delim = '\t', col_names = "num")
+indv <- read_delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.filtered.012.indv.join", delim = '\t', col_names = c("num", "id"))
+
+## write out 012 matrix for SNPrune
+prune <- left_join(indv, df, by = 'num') %>%
   select(-c(num)) %>%
-  remove_rownames %>% 
-  column_to_rownames(var="id")
-# replace -1 from vcftools with -9 for sequoia 
-join[ join == -1 ] <- -9
+  filter(id != 'dedup/BAM_11.dedup.bam') %>%
+  filter(id != 'dedup/OBBB_1.dedup.bam') %>%
+  filter(id != 'dedup/OOB_1.dedup.bam')
 
-clean <- as.matrix(join)
+# replace -1 from vcftools with -9 
+prune[ prune == -1 ] <- -9
+write_delim(prune, "~/Desktop/stickles.012matrix.txt", delim = ' ', )
 
-# read in life history data - read_delim was being a bit weird so use read.delim instead
-lh.df <- read.delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/lh.df.tsv", sep = '\t') 
-
-# run parental assignment 
-par.out <- sequoia(GenoM = clean,
-                  LifeHistData = lh.df,
-                  Module = 'ped')
