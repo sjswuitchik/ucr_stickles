@@ -25,7 +25,7 @@ prune <- left_join(indv, df, by = 'num') %>%
 
 # replace -1 from vcftools with -9 
 prune[ prune == -1 ] <- -9
-write_delim(prune, "~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.012matrix.txt", delim = ' ', )
+write_delim(prune, "~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.012matrix.tsv", delim = '\t', col_names = F)
 
 ####
 # sftp stickles.012matrix.txt to Cedar in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
