@@ -1,8 +1,8 @@
 ## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
 
 conda activate vcfFilt
-
-vcftools --vcf stickles.filtered.recode.vcf --012 --out stickles.filtered
+vcftools --vcf stickles.filtered.recode.vcf --maf 0.01 --max-missing 1 --recode --recode-INFO-all --out stickles.prune
+vcftools --vcf stickles.prune.recode.vcf --012 --out stickles.filtered
 # transfer 012 files to local machine to add 0-59 as first field of indv - saved as stickles.filtered.012.indv.join
 
 ####### if doing on Cedar 
