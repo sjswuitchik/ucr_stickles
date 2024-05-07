@@ -28,9 +28,22 @@ mv out.* stickles.filt* int_filt
 tar zcvf int_filt.tar.gz int_filt/
 rm -r int_filt/
 
+### use the above VCF (stickles.filtered.recode.vcf) for QTL mapping, but next steps are for pedigree reconstruction (filtering down to approx. 500 SNPs if possible)
+vcftools --vcf stickles.filtered.recode.vcf --012 --out stickles.filtered
+git clone https://github.com/mariocalus/SNPrune.git
+cd SNPrune
+chmod +x SNPrune
+./SNPrune
+
 # create 012 matrix for pedigree estimation
 vcftools --vcf stickles.filtered.recode.vcf --012 --out stickles.filtered
+
 
 ## calculate IBD in PLINK for pedigree determination
 #plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --recode --out test
 #plink --file test --allow-extra-chr --genome --out test2
+
+#plink --vcf stickles.filtered.recode.vcf --allow-extra-chr --set-all-var-ids --recode --out stickles.plink
+#plink --file stickles.plink --allow-extra-chr --indep-pairwise 100000 50000 0.5 --out stickles.plink
+
+
