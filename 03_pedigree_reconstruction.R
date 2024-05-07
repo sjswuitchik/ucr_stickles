@@ -24,22 +24,22 @@ vcftools --vcf stickles.prune.recode.vcf --012 --out stickles.filtered
 #conda activate rv4
 #R
 
-library(tidyverse)
+#library(tidyverse)
 
 ## load in data to create genotype 012 matrix
 df <- read_delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.filtered.012", delim = '\t', col_names = "num")
 indv <- read_delim("~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.filtered.012.indv.join", delim = '\t', col_names = c("num", "id"))
 
 ## write out 012 matrix for SNPrune
-prune <- left_join(indv, df, by = 'num') %>%
+#prune <- left_join(indv, df, by = 'num') %>%
   select(-c(num)) %>%
   filter(id != 'dedup/BAM_11.dedup.bam') %>% #low mappability
   filter(id != 'dedup/OBBB_1.dedup.bam') %>% # f1
   filter(id != 'dedup/OOB_1.dedup.bam')      # f1
 
 # replace -1 from vcftools with -9 
-prune[ prune == -1 ] <- -9
-write_delim(prune, "~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.012matrix.tsv", delim = '\t', col_names = F)
+#prune[ prune == -1 ] <- -9
+#write_delim(prune, "~/Desktop/MRU_Faculty/Research/ucr_stickles/012_matrix/stickles.012matrix.tsv", delim = '\t', col_names = F)
 
 ####
 # sftp stickles.012matrix.txt to Cedar in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/vcf_filt
