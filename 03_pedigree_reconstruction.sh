@@ -2,7 +2,7 @@
 
 module load StdEnv/2023 java/21.0.1
 
-zcat ../stickles_ucr.dedup.vcf.gz | java -cp bin IBD vcfFile= - > test_IBD.txt
+java -cp bin IBD vcfFile=stickles_ucr.dedup.vcf > test_IBD.txt
 
 
 
