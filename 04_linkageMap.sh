@@ -16,6 +16,7 @@ unzip snpEff_latest_core.zip
 rm snpEff_latest_core.zip
 mkdir -p snpEff/data/gasAcu
 
-
+conda activate vcfFilt
+vcftools --vcf ../vcf_filt/stickles_ucr.dedup.vcf --012 --out stickles.dedup
 
 
