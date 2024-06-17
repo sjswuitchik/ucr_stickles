@@ -1,11 +1,8 @@
-## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/colony
-# download COLONY for Linux from https://www.zsl.org/about-zsl/resources/software/colony and transfer files to working dir
+## in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/linkageMapping
 
-conda activate vcfFilt
-vcftools --vcf stickles.filtered.recode.vcf --maf 0.01 --max-missing 1 --recode --recode-INFO-all --out stickles.prune
-## kept 60/60 indv, 2040/16466 sites
-vcftools --vcf stickles.prune.recode.vcf --012 --out stickles.filtered
-# transfer 012 files to local machine to add 0-59 as first field of indv - saved as stickles.filtered.012.indv.join
+module load StdEnv/2023 java/21.0.1
+
+zcat ../stickles_ucr.dedup.vcf.gz | java -cp bin IBD vcfFile= - > test_IBD.txt
 
 
 
@@ -77,8 +74,15 @@ ped.7.out <- sequoia(GenoM = clean7,
                      Complex = 'simp')
 SummarySeq(ped.7.out)
 
+##################################
 
+# download COLONY for Linux from https://www.zsl.org/about-zsl/resources/software/colony and transfer files to working dir
 
+conda activate vcfFilt
+vcftools --vcf stickles.filtered.recode.vcf --maf 0.01 --max-missing 1 --recode --recode-INFO-all --out stickles.prune
+## kept 60/60 indv, 2040/16466 sites
+vcftools --vcf stickles.prune.recode.vcf --012 --out stickles.filtered
+# transfer 012 files to local machine to add 0-59 as first field of indv - saved as stickles.filtered.012.indv.join
 
 
 
