@@ -16,10 +16,12 @@ unzip snpEff_latest_core.zip
 rm snpEff_latest_core.zip
 mkdir -p snpEff/data/gasAcu
 
-cp ../vcf_filt/stickles.filtered.recode.vcf .
 
-conda activate vcfFilt
-vcftools --vcf stickles.filtered.recode.vcf --remove-indv dedup/OBBB_1.dedup.bam --remove-indv dedup/OOB_1.dedup.bam --recode --recode-INFO-all --out stickles.filt.f2s
-vcftools --vcf stickles.filt.f2s.recode.vcf --012 --out stickles.filt.f2s
+## also in 03_pedigree_reconstruction.sh until I can figure out wtf to do with this lack of ped
+#cp ../vcf_filt/stickles.filtered.recode.vcf .
+#
+#conda activate vcfFilt
+#vcftools --vcf stickles.filtered.recode.vcf --remove-indv dedup/OBBB_1.dedup.bam --remove-indv dedup/OOB_1.dedup.bam --recode --recode-INFO-all --out stickles.filt.f2s
+#vcftools --vcf stickles.filt.f2s.recode.vcf --012 --out stickles.filt.f2s
 
 
