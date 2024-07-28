@@ -16,10 +16,10 @@ unzip snpEff_latest_core.zip
 rm snpEff_latest_core.zip
 mkdir -p snpEff/data/gasAcu
 
-cp ../vcf_filt/stickles_ucr.dedup.vcf .
+cp ../vcf_filt/stickles.filtered.recode.vcf .
 
 conda activate vcfFilt
-vcftools --vcf stickles_ucr.dedup.vcf --remove-indv dedup/OBBB_1.dedup.bam --remove-indv dedup/OOB_1.dedup.bam --012 --out stickles.dedup.f2s
-
+vcftools --vcf stickles.filtered.recode.vcf --remove-indv dedup/OBBB_1.dedup.bam --remove-indv dedup/OOB_1.dedup.bam --recode --recode-INFO-all --out stickles.filt.f2s
+vcftools --vcf stickles.filt.f2s.recode.vcf --012 --out stickles.filt.f2s
 
 
