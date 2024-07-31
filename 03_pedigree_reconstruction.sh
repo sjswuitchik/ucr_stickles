@@ -8,8 +8,7 @@ java -cp lepmap/bin/ IBD vcfFile=../stickles.filt.f2s.recode.vcf > stickles.filt
 
 # separate by tank to attempt IBD again 
 vcftools --vcf stickles.filt.f2s.recode.vcf --keep tank2.indv --recode --recode-INFO-all --out stickles.filt.f2s.tank2
-vcftools --vcf stickles.filt.f2s.recode.vcf --keep tank7.indv --recode --recode-INFO-all --out stickles.filt.f2s.tank7
-## this also removes BAM11 by default (low mappability)
+vcftools --vcf stickles.filt.f2s.recode.vcf --keep tank7.indv --remove-indv dedup/BAM_11.dedup.bam --recode --recode-INFO-all --out stickles.filt.f2s.tank7
 java -cp lepmap/bin/ IBD vcfFile=stickles.filt.f2s.tank7.recode.vcf > stickles.filt.f2s.tank7.ibd
 
 
