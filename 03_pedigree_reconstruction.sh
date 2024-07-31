@@ -9,8 +9,17 @@ java -cp lepmap/bin/ IBD vcfFile=../stickles.filt.f2s.recode.vcf > stickles.filt
 # separate by tank to attempt IBD again 
 vcftools --vcf stickles.filt.f2s.recode.vcf --keep tank2.indv --recode --recode-INFO-all --out stickles.filt.f2s.tank2
 vcftools --vcf stickles.filt.f2s.recode.vcf --keep tank7.indv --remove-indv dedup/BAM_11.dedup.bam --recode --recode-INFO-all --out stickles.filt.f2s.tank7
-java -cp lepmap/bin/ IBD vcfFile=stickles.filt.f2s.tank7.recode.vcf > stickles.filt.f2s.tank7.ibd
 
+java -cp lepmap/bin/ IBD vcfFile=stickles.filt.f2s.tank7.recode.vcf > stickles.filt.f2s.tank7.ibd
+sort -n -r -k 3,3 stickles.filt.f2s.tank7.ibd | less # all comps above 0.5
+
+# with F1s
+vcftools --vcf stickles.filtered.recode.vcf --remove-indv dedup/BAM_11.dedup.bam --keep tank7.indv --recode --recode-INFO-all --out stickles.filt.tank7
+java -cp lepmap/bin/ IBD vcfFile=stickles.filt.tank7.recode.vcf > stickles.filt.tank7.ibd
+sort -n -r -k 3,3 stickles.filt.tank7.ibd | less # nope
+
+java -cp lepmap/bin/ IBD vcfFile=stickles.filt.f2s.tank2.recode.vcf > stickles.filt.f2s.tank2.ibd
+sort -n -r -k 3,3 stickles.filt.f2s.tank2.ibd | less # worked better, but only 3 comps below 0.5
 
 
 #######################################
