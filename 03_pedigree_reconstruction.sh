@@ -21,6 +21,9 @@ sort -n -r -k 3,3 stickles.filt.tank7.all.ibd | less # nope
 java -cp lepmap/bin/ IBD vcfFile=stickles.filt.f2s.tank2.recode.vcf > stickles.filt.f2s.tank2.ibd
 sort -n -r -k 3,3 stickles.filt.f2s.tank2.ibd | less # worked better, but only 3 comps below 0.5
 
+#### trying with r/qtl map making? 
+vcftools --vcf stickles.filt.f2s.tank2.recode.vcf --012 --out stickles.filt.f2s.tank2
+
 
 #######################################
 # stuff that hasn't worked but I'm not ready to throw away yet 
