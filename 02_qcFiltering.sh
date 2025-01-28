@@ -28,3 +28,4 @@ mv out.* stickles.filt* int_filt
 tar zcvf int_filt.tar.gz int_filt/
 rm -r int_filt/
 
+cp stickles.filtered.recode.vcf ..
