@@ -16,5 +16,6 @@ cp gasAcu.filter.chrRename.vcf gwas_gemma/
 cd gwas_gemma
 
 ## use run_gwas_gemma.sh from required_files on this repo to preserve edits that are required to run GWAS on nonhuman genome
+## submit run_gemma.sh from required_files in the gwas_gemma directory with the phenos.tsv and VCF in the same directory
 
-bash run_gwas_gemma.sh phenos.tsv gasAcu.filter.chrRename.vcf
+sbatch --account=def-sjsmith run_gemma.sh
