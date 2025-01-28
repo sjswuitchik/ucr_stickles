@@ -14,3 +14,7 @@ bcftools annotate stickles.filtered.recode.vcf --rename-chrs gasAcu.chromMap -o 
 
 cp gasAcu.filter.chrRename.vcf gwas_gemma/
 cd gwas_gemma
+
+## use run_gwas_gemma.sh from required_files on this repo to preserve edits that are required to run GWAS on nonhuman genome
+
+bash run_gwas_gemma.sh phenos.tsv gasAcu.filter.chrRename.vcf
