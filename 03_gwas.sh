@@ -12,6 +12,11 @@ bcftools view -H stickles.filtered.recode.vcf | cut -f 1 | uniq | awk '{print $0
 
 bcftools annotate stickles.filtered.recode.vcf --rename-chrs gasAcu.chromMap -o gasAcu.filter.chrRename.vcf -O v
 
+##### notes for myself for when I pick up tomorrow 
+# - need to remove OBBB_1 and OOB_1 from VCF - can also refilter for --max-missing-count 3 and --min-ac 1 and doublecheck that min/max alleles is at 2, and indels are removed
+# - need to create individual phenotype files for each one - confirm with Tim & Seth what they want to do for S/F trials
+# - double check if BAM 11 needs to be removed from the phenotypes (I think it does) 
+
 cp gasAcu.filter.chrRename.vcf gwas_gemma/
 cd gwas_gemma
 
