@@ -6,7 +6,7 @@ git clone https://github.com/johanzi/gwas_gemma.git
 
 ## chromosomes need to be converted from alpahnumeric to numeric values. 
 # create chromosome map
-bcftools view -H stickles.filtered.recode.vcf | cut -f 1 | uniq | awk '{print $0"\t"$0}' > gasAcu.chrom.map.txt
+bcftools view -H stickles.filtered.recode.vcf | cut -f 1 | uniq | awk '{print $0}' > gasAcu.chrom.map.txt
 
 ## edit in R (because I don't have the capacity to loop this rn) gasAcu.chrom.map.txt using sequence report from NCBI (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_016920845.1/) to assign numerical chr names, then save as gasAcu.chromMap
 
