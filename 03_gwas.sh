@@ -30,6 +30,10 @@ vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_19.dedu
 cp gasAcu.chrRename.final.recode.vcf gasAcu.chrRename.noFails.recode.vcf gwas_gemma/
 cd gwas_gemma
 
+bcftools query -l gasAcu.chrRename.final.recode.vcf > order_accession.txt
+
+
+
 ## use run_gwas_gemma.sh from required_files on this repo to preserve edits that are required to run GWAS on nonhuman genome
 ## submit run_gemma.sh from required_files in the gwas_gemma directory with the phenos.tsv and VCF in the same directory
 
