@@ -1,7 +1,8 @@
 # create env for gemma gwas
 conda conda create -n gwas -c esgf -c bioconda -c ostrokach python plink vcftools bcftools gemma
-conda install --name gwas -c conda-forge libgfortran5
 conda activate gwas
+conda install -c conda-forge libgfortran5
+
 
 # get gemma
 git clone https://github.com/johanzi/gwas_gemma.git
