@@ -1,7 +1,7 @@
 # create env for gemma gwas
 conda conda create -n gwas -c esgf -c bioconda -c ostrokach python plink vcftools bcftools gemma
 conda activate gwas
-conda install -c conda-forge libgfortran5
+conda install -c conda-forge libgfortran5 ## need to update to py3 before installing libgfortran5 
 
 
 # get gemma
