@@ -183,7 +183,7 @@ if [ -e ${path_prefix_vcf}.bed ] && [ -e ${path_prefix_vcf}.bim ] && [ -e ${path
 	echo "File ${path_prefix_vcf}.bed, ${path_prefix_vcf}.bim, ${path_prefix_vcf}.fam already exist. Go to next step."
 else
 	printf "plink --file ${path_prefix_vcf} --make-bed --out ${path_prefix_vcf}" 
-	plink --file ${path_prefix_vcf} --set-chr 250 --allow-extra-chr --make-bed --out ${path_prefix_vcf}  
+	plink --file ${path_prefix_vcf} --allow-extra-chr --make-bed --out ${path_prefix_vcf}  
 fi
 
 
