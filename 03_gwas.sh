@@ -4,6 +4,8 @@ conda activate gwas
 conda install -c conda-forge libgfortran5 ## need to update to py3 before installing libgfortran5 
 
 
+conda create -n gwas -c conda-forge python=3.11.6
+
 # get gemma
 git clone https://github.com/johanzi/gwas_gemma.git
 
