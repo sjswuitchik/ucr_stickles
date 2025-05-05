@@ -1,4 +1,5 @@
 # create env for gemma gwas
+## NB: ended up not using GEMMA for GWAS but the bcf/vcftools still worked in this conda env
 conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10 plink vcftools bcftools gemma libgfortran5 
 conda activate gwas
 
