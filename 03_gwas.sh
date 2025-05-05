@@ -29,7 +29,7 @@ conda activate plink2
 
 #success-failure
 plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf
-plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --pfilter 1e-6 --out gasAcu.plink
+g
 mv gasAcu.plink.log gasAcu.plink.sf.log
 
 conda install -c conda-forge r-base
