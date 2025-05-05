@@ -32,19 +32,23 @@ conda deactivate
 conda create -n plink2 -c bioconda plink2
 conda activate plink2
 
-plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno successFailphenos.tsv --out gasAcu.plink.sf
-# 58 indv, 16466 variants loaded, 1 categorical phenotype loaded 
-# 16403 remaining after HWE filter (63 removed) 
-
-plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf.cc
-plink2 --pfile gasAcu.plink.sf.cc --allow-extra-chr --glm --pfilter 1e-6 --out gasAcu.plink.sf.cc.gwas
+#success-failure
+plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --pfilter 1e-6 --out gasAcu.plink
+mv gasAcu.plink.log gasAcu.plink.sf.log
 
 conda install -c conda-forge r-base
 
+while IFS= read -r file
+do
+  plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
+done < "cont.phenos"
 
-plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --out gasAcu.plink.cont
-plink2 --pfile gasAcu.plink.cont --allow-extra-chr --glm allow-no-covars --pfilter 1e-6 --out gasAcu.plink.cont.gwas
-
+while IFS= read -r file
+do
+  plink2 --pfile gasAcu.plink.$file --allow-extra-chr --glm --adjust --out gasAcu.plink
+  mv gasAcu.plink.log gasAcu.plink.$file.log
+done < "cont.phenos"
 
 
 
