@@ -39,6 +39,7 @@ mv gasAcu.plink.log gasAcu.plink.sf.log
 
 conda install -c conda-forge r-base
 
+# continuous traits 
 while IFS= read -r file
 do
   plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
@@ -50,16 +51,11 @@ do
   mv gasAcu.plink.log gasAcu.plink.$file.log
 done < "cont.phenos"
 
+mkdir gwas_results
 
+while IFS= read -r file
+do
+  mv gasAcu.plink.$file.* gwas_results/
+done < "cont.phenos"
 
-
-
-#cp gasAcu.chrRename.final.recode.vcf gasAcu.chrRename.noFails.recode.vcf gwas_gemma/
-#cd gwas_gemma
-
-#bcftools query -l gasAcu.chrRename.final.recode.vcf > order_accession.txt
-
-## use run_gwas_gemma.sh from required_files on this repo to preserve edits that are required to run GWAS on nonhuman genome
-## submit run_gemma.sh from required_files in the gwas_gemma directory with the phenos.tsv and VCF in the same directory
-
-#sbatch --account=def-sjsmith run_gemma.sh
+mv gasAcu.plink.sf* gwas_results/
