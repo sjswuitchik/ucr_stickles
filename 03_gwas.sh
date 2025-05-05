@@ -3,7 +3,6 @@ conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10
 conda activate gwas
 conda install -c conda-forge libgfortran5 ## need to update to py3 before installing libgfortran5 
 
-
 conda create -n gwas -c conda-forge python=3.11.6
 
 # get gemma
@@ -29,15 +28,34 @@ vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_19.dedu
 
 ##### use the gasAcu.chrRename.noFails.recode.vcf for the continuous variable GWAS
 
+conda deactivate 
+conda create -n plink2 -c bioconda plink2
+conda activate plink2
 
-cp gasAcu.chrRename.final.recode.vcf gasAcu.chrRename.noFails.recode.vcf gwas_gemma/
-cd gwas_gemma
+plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno successFailphenos.tsv --out gasAcu.plink.sf
+# 58 indv, 16466 variants loaded, 1 categorical phenotype loaded 
+# 16403 remaining after HWE filter (63 removed) 
 
-bcftools query -l gasAcu.chrRename.final.recode.vcf > order_accession.txt
+plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf.cc
+plink2 --pfile gasAcu.plink.sf.cc --allow-extra-chr --glm --pfilter 1e-6 --out gasAcu.plink.sf.cc.gwas
+
+conda install -c conda-forge r-base
 
 
+plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --out gasAcu.plink.cont
+plink2 --pfile gasAcu.plink.cont --allow-extra-chr --glm allow-no-covars --pfilter 1e-6 --out gasAcu.plink.cont.gwas
+
+
+
+
+
+
+#cp gasAcu.chrRename.final.recode.vcf gasAcu.chrRename.noFails.recode.vcf gwas_gemma/
+#cd gwas_gemma
+
+#bcftools query -l gasAcu.chrRename.final.recode.vcf > order_accession.txt
 
 ## use run_gwas_gemma.sh from required_files on this repo to preserve edits that are required to run GWAS on nonhuman genome
 ## submit run_gemma.sh from required_files in the gwas_gemma directory with the phenos.tsv and VCF in the same directory
 
-sbatch --account=def-sjsmith run_gemma.sh
+#sbatch --account=def-sjsmith run_gemma.sh
