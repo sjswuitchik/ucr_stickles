@@ -54,3 +54,13 @@ do
 done < "cont.phenos"
 
 mv gasAcu.plink.sf* gwas_results/
+
+# convert plink 2.0 to plink 1.9 for LD analyses
+cp cont.phenos gwas_results/
+
+while read file
+do 
+  plink2 --pfile gasAcu.plink.$file --make-bed --allow-extra-chr --out gasAcu.plink19.$file
+done < cont.phenos
+
+
