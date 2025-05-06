@@ -1,3 +1,5 @@
+library(tidyverse)
+
 file_paths_pvar <- list.files(file_dir, pattern="gasAcu.plink.*\\.pvar$", full.names = TRUE)
 
 for (file in file_paths_pvar) {
