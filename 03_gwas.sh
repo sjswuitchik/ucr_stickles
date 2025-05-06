@@ -28,17 +28,16 @@ conda create -n plink2 -c bioconda plink2
 conda activate plink2
 
 #success-failure
-plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf
-g
-mv gasAcu.plink.log gasAcu.plink.sf.log
-
-conda install -c conda-forge r-base
+plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf
 
 # continuous traits 
 while IFS= read -r file
 do
-  plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
+  plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "cont.phenos"
+
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --adjust --out gasAcu.plink
+mv gasAcu.plink.log gasAcu.plink.sf.log
 
 while IFS= read -r file
 do
