@@ -4,3 +4,5 @@ conda activate fastq2vcf
 conda install -c bioconda openssl=1.0 # for bcftools issue
 
 conda create -n vcfFilt -c bioconda plink vcftools htslib bcftools rename
+
+conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10 plink vcftools bcftools gemma libgfortran5 
