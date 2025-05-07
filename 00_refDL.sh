@@ -10,7 +10,7 @@ rm -r *.zip ncbi_dataset *.json*
 mv GCF_016920845.1/genomic.gff GCF_016920845.1/stickle.gff
 
 conda deactivate
-#conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools (also outlined in 01_processing.sh)
+#conda create -n stacks -c bioconda stacks fastqc multiqc bwa samtools bcftools (also outlined in 00_setupEnv.sh)
 conda activate stacks
 
 bwa index GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna
