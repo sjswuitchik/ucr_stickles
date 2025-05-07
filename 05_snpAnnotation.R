@@ -48,3 +48,46 @@ ttpg_sig_ann <- ttpg_sig %>%
   inner_join(ttpg.pvar, by = c("CHR", "POS", "ID")) %>%
   dplyr::select(ID) %>%
   write_delim(., "ttpg_sig_snps.txt", delim = '\t')
+
+##### make "BED" files for gene association
+mce_sig %>% 
+  inner_join(maxCranElev.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "mce_sig_forBED.txt", delim = '\t')
+
+md_sig %>% 
+  inner_join(maxDecel.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "md_sig_forBED.txt", delim = '\t')
+
+ppdmg_sig %>% 
+  inner_join(PPD_MG.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "ppdmg_sig_forBED.txt", delim = '\t')
+
+rs_sig %>% 
+  inner_join(ramSpeed.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "rs_sig_forBED.txt", delim = '\t')
+
+thdvmg_sig %>% 
+  inner_join(time_HDvMG.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "thdvmg_sig_forBED.txt", delim = '\t')
+
+ttpg_sig %>% 
+  inner_join(ttpg.pvar, by = c("chr", "pos", "ID")) %>%
+  select(-c(REF, ALT, p)) %>%
+  mutate(start = pos - 1) %>%
+  select(chr, start, end = pos, ID) %>%
+  write_delim(., "ttpg_sig_forBED.txt", delim = '\t')
