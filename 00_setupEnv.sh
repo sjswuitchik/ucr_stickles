@@ -9,4 +9,4 @@ conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10
 
 conda create -n plink2 -c bioconda plink2
 
-conda create -n bedtools -c bioconda bedtools bedops
+conda create -n bedtools -c bioconda -c conda-forge bedtools bedops perl
