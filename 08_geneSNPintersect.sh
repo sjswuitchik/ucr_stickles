@@ -14,6 +14,20 @@ sed 's/ //g' gasAcu.bed > gasAcu.nws.bed
 ./replace_chrs.pl gasAcu_acckey gasAcu.nws.bed > gasAcu.nws.repl.bed
 
 bedtools sort -i gasAcu.nws.repl.bed > gasAcu.sorted.bed
+awk '$8 == "gene"' gasAcu.sorted.bed > gasAcu.gene.bed
+
+## make chrom sizes file for windows  
+wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faToTwoBit
+chmod +x ./faToTwoBit
+
+wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/twoBitInfo
+chmod +x ./twoBitInfo
+
+ ./faToTwoBit ../reference/GCF_016920845.1/GCF_016920845.1_GAculeatus_UGA_version5_genomic.fna gasAcu.fa.2bit
+ ./twoBitInfo gasAcu.fa.2bit stdout | sort -k2rn > gasAcu.chrom.sizes
+
+bedtools makewindows -g gasAcu.chrom.sizes -w 100000 -s 50000 > gasAcu.windows.bed
+bedtools slop -i gasAcu.gene.bed -g gasAcu.chrom.sizes -b 100000 | less -S 
 
 ##### this needs to be dealt with tomorrow to make sure the SNP is being captured within the window
 ##### intersect, merge, perhaps slop? 
