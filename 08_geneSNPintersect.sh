@@ -15,6 +15,8 @@ sed 's/ //g' gasAcu.bed > gasAcu.nws.bed
 
 bedtools sort -i gasAcu.nws.repl.bed > gasAcu.sorted.bed
 
+##### this needs to be dealt with tomorrow to make sure the SNP is being captured within the window
+
 bedtools sort -i mce_sig_forBED.bed | bedtools intersect -a - -b gasAcu.sorted.bed -wb > mce_windows.bed
 bedtools sort -i md_sig_forBED.bed | bedtools intersect -a - -b gasAcu.sorted.bed -wb > md_windows.bed
 bedtools sort -i ppdmg_sig_forBED.bed | bedtools intersect -a - -b gasAcu.sorted.bed -wb > ppdmg_windows.bed
