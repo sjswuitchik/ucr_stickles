@@ -32,4 +32,4 @@ sed 's/NA/MT/g' gasAcu_acckey > gasAcu.acckey
 bedtools sort -i cleanGenes.bed | bedtools intersect -a gasAcu.windows.repl.bed -b - -wb | bedtools sort -i - | bedtools merge -i - -d 1 -c 4,8,9 -o distinct > gasAcu.genes.intersect.bed
 
 # clean up gene names field by removing unnamed LOCs
-sed 's/LOC[0-9]\+,//g' gasAcu.genes.intersect.bed > gasAcu.genes.clean.bed 
+sed 's/LOC[0-9]\+,//g' gasAcu.genes.intersect.bed | sed 's/','/ /g' > gasAcu.genes.clean.bed 
