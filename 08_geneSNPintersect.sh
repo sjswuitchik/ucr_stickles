@@ -29,4 +29,4 @@ sed 's/NA/MT/g' gasAcu_acckey > gasAcu.acckey
 ./replace_chrs.pl gasAcu.acckey gasAcu.windows.bed > gasAcu.windows.repl.bed
 
 # intersect clean genes BED with windows
-bedtools sort -i cleanGenes.bed | bedtools intersect -a - -b gasAcu.windows.repl.bed -wb > gasAcu.genes.intersect.bed
+bedtools sort -i cleanGenes.bed | bedtools intersect -a gasAcu.windows.repl.bed -b - -wb | bedtools sort -i - | bedtools merge -i - -d 1 -c 4,8,9 -o distinct > gasAcu.genes.intersect.bed
