@@ -49,63 +49,54 @@ ttpg_sig_ann <- ttpg_sig %>%
   dplyr::select(ID) %>%
   write_delim(., "ttpg_sig_snps.txt", delim = '\t')
 
-##### make .BED files for gene association
-mce_sig %>% 
+##### make .BED file for gene association
+mce_bed <- mce_sig %>% 
   inner_join(maxCranElev.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/mce_sig_forBED.bed", delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "mce") %>%
+  select(chr, start, end, ID, pheno)
 
-md_sig %>% 
+md_bed <- md_sig %>% 
   inner_join(maxDecel.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/md_sig_forBED.bed", delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "md") %>%
+  select(chr, start, end, ID, pheno)
 
-ppdmg_sig %>% 
+ppdmg_bed <- ppdmg_sig %>% 
   inner_join(PPD_MG.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/ppdmg_sig_forBED.bed", delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "ppdmg") %>%
+  select(chr, start, end, ID, pheno)
 
-rs_sig %>% 
+rs_bed <- rs_sig %>% 
   inner_join(ramSpeed.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/rs_sig_forBED.bed", delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "rs") %>%
+  select(chr, start, end, ID, pheno)
 
-thdvmg_sig %>% 
+thdvmg_bed <- thdvmg_sig %>% 
   inner_join(time_HDvMG.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/thdvmg_sig_forBED.bed", delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "thdvmg") %>%
+  select(chr, start, end, ID, pheno)
 
-ttpg_sig %>% 
+ttpg_bed <- ttpg_sig %>% 
   inner_join(ttpg.pvar, by = c("chr", "pos", "ID")) %>%
   select(-c(REF, ALT, p)) %>%
-  mutate(start = pos - 1) %>%
-  select(chr, start, end = pos, ID) %>%
-  mutate(chromStart = start - 100000,
-         chromEnd = end + 100000) %>%
-  select(chr, chromStart, chromEnd, ID) %>%
-  write_delim(., "geneAssoc/ttpg_sig_forBED.bed",  delim = '\t', col_names = F)
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "ttpg") %>%
+  select(chr, start, end, ID, pheno)
+
+clean_bed <- bind_rows(mce_bed, md_bed, ppdmg_bed, rs_bed, thdvmg_bed, ttpg_bed)
+write_delim(clean_bed, "geneAssoc/cleanGenes.bed", delim = '\t', col_names = F)
