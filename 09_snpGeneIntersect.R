@@ -14,3 +14,8 @@ gene_clean <- genes %>%
 write_delim(gene_clean, "geneAssoc/gasAcu.final.cleanGenes.bed", delim = "\t")
 write_delim(gene_clean, "geneAssoc/gasAcu.final.cleanGenes.txt", delim = "\t")
 write_delim(gene_clean, "geneAssoc/gasAcu.final.cleanGenes.csv", delim = ",")
+
+snpList <- gene_clean %>%
+  select(chr, end)
+
+write_delim(snpList, "geneAssoc/snpList", delim = "\t")
