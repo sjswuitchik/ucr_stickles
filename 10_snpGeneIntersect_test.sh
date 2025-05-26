@@ -5,7 +5,9 @@ vcftools --vcf ../gasAcu.filter.chrRename.vcf --bed cleanGenes.bed --recode --re
 
 cp ../gasAcu.chromMap .
 
-awk 
+cat gasAcu.chromMap | awk '{print $2 "\t" $1}' > gasAcu.revChrMap
+
+bcftools annotate gasAcu.snps.recode.vcf --rename-chrs gasAcu.revChrMap -o gasAcu.snps.chrRename.vcf -O v
 
 
 # took this output to use in a trial of OmicsBox to run Genetic Variation > Variant Annotation 
