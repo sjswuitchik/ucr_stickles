@@ -10,5 +10,3 @@ conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10
 conda create -n plink2 -c bioconda plink2 gcta
 
 conda create -n bedtools -c bioconda -c conda-forge bedtools bedops
-
-conda create -n king -c bioconda king # there were conflicts with plink2
