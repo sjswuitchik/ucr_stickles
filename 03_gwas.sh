@@ -38,6 +38,17 @@ do
   plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "cont.phenos"
 
+
+## new stuff
+
+gcta64 --bfile gasAcu.plink19.sf --ld-score-region 200 --out gasAcu.sf.test
+
+
+
+
+
+## old stuff
+
 plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --adjust --out gasAcu.plink
 mv gasAcu.plink.log gasAcu.plink.sf.log
 
@@ -65,4 +76,40 @@ do
 done < cont.phenos
 
 plink2 --pfile gasAcu.plink.sf --make-bed --allow-extra-chr --out gasAcu.plink19.sf
+
+
+
+
+### random new things that aren't working/correct but I'm not ready to get rid of yet
+
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --make-rel --out gasAcu.sf.grm
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --make-grm-bin --out gasAcu.sf.grm.bin
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --grm-bin gasAcu.sf.grm.bin --adjust --out gasAcu.plink.grm
+
+
+
+
+
+
+
+gcta64 --pfile gasAcu.plink.sf --make-grm --autosome --out gasAcu.plink.sf
+
+gcta64 --grm <pheno.grm> --make-bK-sparse 0.05 --out <pheno>.sp.grm
+
+## alternatively, can do: 
+gcta64 --pfile gasAcu.plink.sf --make-grm --sparse-cutoff 0.05 --out gasAcu.plink.sf
+
+gcta64 --pfile gasAcu.plink.sf --fastGWA-mlm --grm-sparse gasAcu.plink.sf.grm.sp --nofilter --out gasAcu.plink.sf.gcta
+--pheno ../sf.caseControlphenos.tsv
+
+
+
+gcta64 --pfile <pheno> --make-grm --autosome --out <pheno.grm>
+
+gcta64 --grm <pheno.grm> --make-bK-sparse 0.05 --out <pheno>.sp.grm
+
+## alternatively, can do: 
+gcta64 --pfile <pheno> --make-grm --sparse-cutoff 0.05 --out <pheno.sp.grm>
+
+gcta64 --pfile <pheno> --pheno <pheno> --fastGWA-mlm --grm-sparse <pheno.sp.grm> --nofilter -- --out <newresults>
 
