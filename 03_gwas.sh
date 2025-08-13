@@ -3,6 +3,8 @@
 conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10 plink vcftools bcftools gemma libgfortran5 
 conda activate gwas
 
+# in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr
+
 ## chromosomes need to be converted from alpahnumeric to numeric values. 
 # create chromosome map
 bcftools view -H stickles.filtered.recode.vcf | cut -f 1 | uniq | awk '{print $0}' > gasAcu.chrom.map.txt
