@@ -38,15 +38,6 @@ do
   plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "cont.phenos"
 
-
-## new stuff
-
-gcta64 --bfile gasAcu.plink19.sf --ld-score-region 200 --out gasAcu.sf.test
-
-
-
-
-
 ## old stuff
 
 plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --adjust --out gasAcu.plink
@@ -88,7 +79,7 @@ plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --grm-bin gasAcu.sf.grm.b
 
 
 
-
+plink2 --pfile gasAcu.plink.sf --allow-extra-chr --make-king-table --out gasAcu.sf.king
 
 
 
