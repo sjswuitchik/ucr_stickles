@@ -73,6 +73,15 @@ plink2 --pfile gasAcu.plink.ppdmg --make-bed --allow-extra-chr --out gasAcu.plin
 
 
 
+
+
+
+
+
+
+
+
+
 ### random new things that aren't working/correct but I'm not ready to get rid of yet
 
 plink2 --pfile gasAcu.plink.sf --allow-extra-chr --make-rel --out gasAcu.sf.grm
