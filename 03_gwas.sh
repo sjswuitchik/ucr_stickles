@@ -32,13 +32,14 @@ conda activate plink2
 #success-failure
 plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno sf.caseControlphenos.tsv --out gasAcu.plink.sf
 
+# ppdmg 
+plink2 --vcf gasAcu.chrRename.final.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos_ppdmg.tsv --out gasAcu.plink.ppdmg
+
 # continuous traits 
 while IFS= read -r file
 do
   plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "cont.phenos"
-
-## old stuff
 
 plink2 --pfile gasAcu.plink.sf --allow-extra-chr --glm --adjust --out gasAcu.plink
 mv gasAcu.plink.log gasAcu.plink.sf.log
@@ -68,6 +69,7 @@ done < cont.phenos
 
 plink2 --pfile gasAcu.plink.sf --make-bed --allow-extra-chr --out gasAcu.plink19.sf
 
+plink2 --pfile gasAcu.plink.ppdmg --make-bed --allow-extra-chr --out gasAcu.plink19.ppdmg
 
 
 
