@@ -10,10 +10,10 @@ vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_18.dedu
 conda deactivate 
 conda activate plink2 
 
-while IFS= read -r file
+while read file
 do
   plink2 --vcf gasAcu.chrRename.morph.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno morph_phenos.tsv --pheno-name $file --out gasAcu.plink.$file
-done < "morph.phenos"
+done < morph.phenos
 
 while read file
 do 
