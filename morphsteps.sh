@@ -5,6 +5,7 @@ conda activate vcfFilt
 
 # remove individuals that don't have morph phenos
 vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_18.dedup.bam --remove-indv dedup/BAM_59.dedup.bam --recode --recode-INFO-all --out gasAcu.chrRename.morph
+# kept 56/58 invd, 16466/16466 sites
 
 conda deactivate 
 conda activate plink2 
