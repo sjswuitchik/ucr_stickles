@@ -1,14 +1,37 @@
-library(reshape2)
-library(viridis)
-library(tidyverse)
+#### Create LD matrices that are plotable
 
-mce_ld_mat <- read.table("mce_ld_matrix.ld", header = F)
-rownames(mce_ld_mat) <- mce_sig_ann$ID
-colnames(mce_ld_mat) <- mce_sig_ann$ID
+mce.ld.mat <- read.table("mce_ld_matrix.ld", header = F)
+rownames(mce.ld.mat) <- mce.sig.ann$variant.id
+colnames(mce.ld.mat) <- mce.sig.ann$variant.id
 
-mce_ld_long <- melt(as.matrix(mce_ld_mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
+mce.ld.long <- melt(as.matrix(mce.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
 
-ggplot(mce_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
+md.ld.mat <- read.table("md_ld_matrix.ld", header = F)
+rownames(md.ld.mat) <- md.sig.ann$variant.id
+colnames(md.ld.mat) <- md.sig.ann$variant.id
+
+md.ld.long <- melt(as.matrix(md.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
+
+time_hdvmg.ld.mat <- read.table("time_hdvmg_ld_matrix.ld", header = F)
+rownames(time_hdvmg.ld.mat) <- time.hdvmg.sig.ann$variant.id
+colnames(time_hdvmg.ld.mat) <- time.hdvmg.sig.ann$variant.id
+
+time_hdvmg.ld.long <- melt(as.matrix(time_hdvmg.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
+
+time_mdvmg.ld.mat <- read.table("time_mdvmg_ld_matrix.ld", header = F)
+rownames(time_mdvmg.ld.mat) <- time.mdvmg.sig.ann$variant.id
+colnames(time_mdvmg.ld.mat) <- time.mdvmg.sig.ann$variant.id
+
+time_mdvmg.ld.long <- melt(as.matrix(time_mdvmg.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
+
+ttpg.ld.mat <- read.table("ttpg_ld_matrix.ld", header = F)
+rownames(ttpg.ld.mat) <- ttpg.sig.ann$variant.id
+colnames(ttpg.ld.mat) <- ttpg.sig.ann$variant.id
+
+ttpg.ld.long <- melt(as.matrix(ttpg.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
+
+## Heat maps
+ggplot(mce.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
   geom_tile() +
   scale_fill_viridis(option = "viridis") + 
   theme_minimal() +
@@ -17,15 +40,9 @@ ggplot(mce_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
     axis.text.y = element_text(size = 6),
     panel.grid = element_blank()
   ) +
-  labs(title = "LD Heatmap (r²)", x = "SNP", y = "SNP", fill = expression(r^2))
+  labs(title = "LD Heatmap (r²) MaxCranElev", x = "SNP", y = "SNP", fill = expression(r^2))
 
-md_ld_mat <- read.table("md_ld_matrix.ld", header = F)
-rownames(md_ld_mat) <- md_sig_ann$ID
-colnames(md_ld_mat) <- md_sig_ann$ID
-
-md_ld_long <- melt(as.matrix(md_ld_mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
-
-ggplot(md_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
+ggplot(md.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
   geom_tile() +
   scale_fill_viridis(option = "viridis") + 
   theme_minimal() +
@@ -34,15 +51,9 @@ ggplot(md_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
     axis.text.y = element_text(size = 6),
     panel.grid = element_blank()
   ) +
-  labs(title = "LD Heatmap (r²)", x = "SNP", y = "SNP", fill = expression(r^2))
+  labs(title = "LD Heatmap (r²) MaxDecel", x = "SNP", y = "SNP", fill = expression(r^2))
 
-thdvmg_ld_mat <- read.table("gwas_results/thdvmg_ld_matrix.ld", header = F)
-rownames(thdvmg_ld_mat) <- thdvmg_sig_ann$ID
-colnames(thdvmg_ld_mat) <- thdvmg_sig_ann$ID
-
-thdvmg_ld_long <- melt(as.matrix(thdvmg_ld_mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
-
-ggplot(thdvmg_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
+ggplot(time_hdvmg.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
   geom_tile() +
   scale_fill_viridis(option = "viridis") + 
   theme_minimal() +
@@ -53,13 +64,18 @@ ggplot(thdvmg_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
   ) +
   labs(title = "LD Heatmap (r²) Time HDvMG", x = "SNP", y = "SNP", fill = expression(r^2))
 
-ttpg_ld_mat <- read.table("gwas_results/ttpg_ld_matrix.ld", header = F)
-rownames(ttpg_ld_mat) <- ttpg_sig_ann$ID
-colnames(ttpg_ld_mat) <- ttpg_sig_ann$ID
+ggplot(time_mdvmg.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
+  geom_tile() +
+  scale_fill_viridis(option = "viridis") + 
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, size = 6),
+    axis.text.y = element_text(size = 6),
+    panel.grid = element_blank()
+  ) +
+  labs(title = "LD Heatmap (r²) Time MDvMG", x = "SNP", y = "SNP", fill = expression(r^2))
 
-ttpg_ld_long <- melt(as.matrix(ttpg_ld_mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
-
-ggplot(ttpg_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
+ggplot(ttpg.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
   geom_tile() +
   scale_fill_viridis(option = "viridis") + 
   theme_minimal() +
@@ -69,4 +85,3 @@ ggplot(ttpg_ld_long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
     panel.grid = element_blank()
   ) +
   labs(title = "LD Heatmap (r²) TTPG", x = "SNP", y = "SNP", fill = expression(r^2))
-
