@@ -12,7 +12,7 @@ conda activate plink2
 
 while IFS= read -r file
 do
-  plink2 --vcf gasAcu.chrRename.morph.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
+  plink2 --vcf gasAcu.chrRename.morph.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno morph_phenos.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "morph.phenos"
 
 while read file
