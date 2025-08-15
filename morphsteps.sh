@@ -22,6 +22,6 @@ done < morph.phenos
 
 mkdir -p gwas_results/morph
 mv gasAcu.plink* gwas_results/morph
-cp morph.phenos gwas_results/morph
+
 
 ## transfer files to comp to use GENESIS in R 
