@@ -22,6 +22,12 @@ vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_19.dedu
 
 ##### use the gasAcu.chrRename.noFails.recode.vcf for the continuous variable GWAS
 
+# remove individuals that don't have morph phenos
+vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_18.dedup.bam --remove-indv dedup/BAM_59.dedup.bam --recode --recode-INFO-all --out gasAcu.chrRename.morph
+# kept 56/58 invd, 16466/16466 sites
+
+##### use the gasAcu.chrRename.morph.recode.vcf for the morphological variable GWAS
+
 conda deactivate 
 conda activate plink2
 
@@ -37,6 +43,12 @@ do
   plink2 --vcf gasAcu.chrRename.noFails.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno phenos.cont.plink2.tsv --pheno-name $file --out gasAcu.plink.$file
 done < "cont.phenos"
 
+# morphological traits
+while read file
+do
+  plink2 --vcf gasAcu.chrRename.morph.recode.vcf --make-pgen --allow-extra-chr --set-all-var-ids @:# --snps-only --hwe 0.05 --pheno morph_phenos.tsv --pheno-name $file --out gasAcu.plink.$file
+done < morph.phenos
+
 # convert plink 2.0 to plink 1.9 for LD analyses
 
 while read file
@@ -48,7 +60,13 @@ plink2 --pfile gasAcu.plink.sf --make-bed --allow-extra-chr --out gasAcu.plink19
 
 plink2 --pfile gasAcu.plink.ppdmg --make-bed --allow-extra-chr --out gasAcu.plink19.ppdmg
 
+while read file
+do 
+  plink2 --pfile gasAcu.plink.$file --make-bed --allow-extra-chr --out gasAcu.plink19.$file
+done < morph.phenos
+
 mkdir gwas_results
+mkdir -p gwas_results/morph
 
 while IFS= read -r file
 do
@@ -58,3 +76,5 @@ done < "cont.phenos"
 mv gasAcu.plink.sf* gwas_results/
 
 mv gasAcu.plink.ppdmg* gwas_results/
+
+mv gasAcu.plink* gwas_results/morph
