@@ -31,3 +31,16 @@ mv gasAcu.plink* gwas_results/morph
 plink --bfile gasAcu.plink19.ray --extract ray_sig_snps.txt --r2 square --allow-extra-chr --out ray_ld_matrix
 
 ## transfer to comp, continue in R
+
+## back for some BED stuff
+# in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/gwas_results/morph
+conda deactivate 
+conda activate bedtools 
+
+cp ../../geneAssoc/gasAcu.windows.repl.bed .
+
+# intersect clean genes BED with windows
+bedtools sort -i rayGenes.bed | bedtools intersect -a gasAcu.windows.repl.bed -b - -wb | bedtools sort -i - | bedtools merge -i - -d 1 -c 4,8,9 -o distinct > gasAcu.rayGenes.intersect.bed
+
+# clean up gene names field by removing unnamed LOCs
+sed 's/LOC[0-9]\+,//g' gasAcu.rayGenes.intersect.bed | sed 's/','/ /g' > gasAcu.rayGenes.clean.bed 
