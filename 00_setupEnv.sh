@@ -7,6 +7,6 @@ conda create -n vcfFilt -c bioconda plink vcftools htslib bcftools rename
 
 conda create -n gwas -c esgf -c bioconda -c ostrokach -c conda-forge python=3.10 plink vcftools bcftools gemma libgfortran5 
 
-conda create -n plink2 -c bioconda plink2 gcta
+conda create -n plink2 -c bioconda plink2
 
 conda create -n bedtools -c bioconda -c conda-forge bedtools bedops
