@@ -1,82 +1,305 @@
-library(qqman)
+#library(BiocManager)
+#BiocManager::install("GENESIS", force = T)
+library(GENESIS)
+library(GWASTools)
+library(SNPRelate)
 library(tidyverse)
+library(qqman)
+library(topr)
+library(reshape2)
+library(viridis)
+library(readxl)
 
+## loading phenotypes
+sf.pheno <- read_delim("~/Desktop/MRU_Faculty/Research/stickles_ucr/gwas_results/phenotypes_gwas/phenos_successFail_plink2_caseControl.tsv") %>%
+  rename(scanID = IID) %>%
+  mutate(sf = if_else(sf == 1, 0, sf),
+         sf = if_else(sf == 2, 1, sf))
 
-# read in each continuous GWAS result & clean
+ppdmg.pheno <- read_delim("~/Desktop/MRU_Faculty/Research/stickles_ucr/gwas_results/phenotypes_gwas/phenos_ppdmg.tsv") %>%
+  rename(scanID = IID)
 
-setwd("~/Desktop/MRU_Faculty/Research/ucr_stickles/gwas_results")
+cont.phenos <- read_delim("~/Desktop/MRU_Faculty/Research/stickles_ucr/gwas_results/phenotypes_gwas/phenos_cont_plink2.tsv") %>%
+  rename(scanID = IID)
 
-file_dir <- "~/Desktop/MRU_Faculty/Research/ucr_stickles/gwas_results"
-file_paths <- list.files(file_dir, pattern="gasAcu.plink.*.glm.linear", full.names = TRUE)
+## create scan annotation dfs
+scanAnnot.sf <- ScanAnnotationDataFrame(sf.pheno)
+scanAnnot.cont <- ScanAnnotationDataFrame(cont.phenos)
+scanAnnot.ppdmg <- ScanAnnotationDataFrame(ppdmg.pheno)
 
+# attempting to loop continuous GWAS
+files <- c("dist", "maxCranElev", "maxDecel", "maxGape", "maxHD", "maxJP", "ppdmg", "PPD_SI", "ramSpeed", "time_HDvMG", "time_maxDecelvMG", "ttpg")
 
-for (file in file_paths) {
+# make GDS function 
+make_gds <- function(pheno) { 
+  snpgdsBED2GDS(bed.fn = paste0("gasAcu.plink19.", pheno, ".bed"),
+                bim.fn = paste0("gasAcu.plink19.", pheno, ".bim"),
+                fam.fn = paste0("gasAcu.plink19.", pheno, ".fam"),
+                out.gdsfn = paste0(pheno, ".gds"),
+                cvt.chr = "char")
+}
+
+for (pheno in files) {
+  make_gds(pheno)
+}
+
+# create KING matrices & geno data
+create_geno <- function(pheno) {
+  geno <- GdsGenotypeReader(filename = paste0(pheno, ".gds"))
+  genoData <- GenotypeData(geno)
+  assign(paste0("genoData.", pheno), genoData, envir = .GlobalEnv)
+}
+
+for (pheno in files) {
+  create_geno(pheno)
+}
+
+create_kin <- function(pheno) {
+  gds <- snpgdsOpen(paste0(pheno, ".gds"), readonly = F, allow.duplicate = T)
+  kin <- snpgdsIBDKING(gds)
+  kin.mat <- kingToMatrix(kin)
+  assign(paste0("kin.mat.", pheno), kin.mat, envir = .GlobalEnv)
+  snpgdsClose(gds)
+}
+
+for (pheno in files) {
+  create_kin(pheno)
+}
+
+# scanAnnot.cont names i.e., no s/f, no ppdmg
+cont.files <- c("dist", "maxCranElev", "maxDecel", "maxGape", "maxHD", "maxJP", "PPD_SI", "ramSpeed", "time_HDvMG", "time_maxDecelvMG", "ttpg")
+
+# create null models 
+for (pheno in cont.files) {
+  kin_name <- paste0("kin.mat.", pheno)
+  null_mod <- fitNullModel(
+    scanAnnot.cont,
+    outcome = pheno,
+    cov.mat = get(kin_name),
+    family = "gaussian"
+  )
+
+  assign(paste0("null.mod.", pheno), null_mod, envir = .GlobalEnv)
+}
+
+# run GWAS analyses for continous phenotypes, clean up results, write out to env
+for (pheno in cont.files) {
+  geno_data <- get(paste0("genoData.", pheno))
+  genoIterator <- GenotypeBlockIterator(geno_data, snpBlock = 10000)
+  assoc <- assocTestSingle(genoIterator, null.model = get(paste0("null.mod.", pheno)), BPPARAM = BiocParallel::SerialParam())
   
-  name <- str_split(basename(file), "\\.", simplify = TRUE)[, 3]
+  assign(paste0("assoc.", pheno), assoc, envir = .GlobalEnv)
   
-  data <- read.table(file, col.names = c("CHR",	"POS", "ID", "REF",	"ALT", "A1",	"TEST",	"OBS_CT",	"OR",	"LOG(OR)_SE",	"Z_STAT",	"P")) %>%
-    dplyr::select(CHR, POS, ID, P) %>%
+  assoc_clean <- assoc %>%
+    mutate(chr = if_else(chr == "U", "23", chr),
+           chr = as.numeric(chr)) %>%
+    rename(chrom = chr, pos = pos, p = Score.pval)
+  
+  assign(paste0("assoc.clean.", pheno), assoc_clean, envir = .GlobalEnv)
+  
+  
+}
+
+## ppdmg GWAS 
+snpgdsBED2GDS(bed.fn = "gasAcu.plink19.ppdmg.bed",
+              bim.fn = "gasAcu.plink19.ppdmg.bim",
+              fam.fn = "gasAcu.plink19.ppdmg.fam",
+              out.gdsfn = "gasAcu.plink19.ppdmg.gds",
+              cvt.chr="char")
+
+geno.ppdmg <- GdsGenotypeReader(filename = "gasAcu.plink19.ppdmg.gds")
+genoData.ppdmg <- GenotypeData(geno.ppdmg)
+
+gds.ppdmg <- snpgdsOpen("gasAcu.plink19.ppdmg.gds", readonly = F, allow.duplicate = T)
+
+kin.ppdmg <- snpgdsIBDKING(gds.ppdmg)
+
+kin.mat.ppdmg <- kingToMatrix(kin.ppdmg)
+
+snpgdsClose(gds.ppdmg)
+
+null.mod.ppdmg <- fitNullModel(scanAnnot.ppdmg, outcome = "PPD_MG", cov.mat = kin.mat.ppdmg, family = "gaussian")
+
+genoIterator.ppdmg <- GenotypeBlockIterator(genoData.ppdmg, snpBlock=10000)
+
+assoc.ppdmg <- assocTestSingle(genoIterator.ppdmg, null.model = null.mod.ppdmg,
+                            BPPARAM = BiocParallel::SerialParam())
+
+assoc.ppdmg.clean <- assoc.ppdmg %>%
+  mutate(chr = if_else(chr == "U", "23", chr),
+         chr = as.numeric(chr)) %>%
+  rename(chrom = chr, pos = pos, p = Score.pval)
+
+
+## binary s/f GWAS
+snpgdsBED2GDS(bed.fn = "gasAcu.plink19.sf.bed",
+              bim.fn = "gasAcu.plink19.sf.bim",
+              fam.fn = "gasAcu.plink19.sf.fam",
+              out.gdsfn = "gasAcu.plink19.sf.gds",
+              cvt.chr="char")
+
+geno.sf <- GdsGenotypeReader(filename = "gasAcu.plink19.sf.gds")
+genoData.sf <- GenotypeData(geno.sf)
+
+gds.sf <- snpgdsOpen("gasAcu.plink19.sf.gds", readonly = F, allow.duplicate = T)
+
+kin.sf <- snpgdsIBDKING(gds.sf)
+
+kin.mat.sf <- kingToMatrix(kin.sf)
+
+snpgdsClose(gds.sf)
+
+null.mod.sf <- fitNullModel(scanAnnot.sf, outcome = "sf", cov.mat = kin.mat.sf, family = "binomial")
+
+genoIterator.sf <- GenotypeBlockIterator(genoData.sf, snpBlock=10000)
+
+assoc.sf <- assocTestSingle(genoIterator.sf, null.model = null.mod.sf,
+                            BPPARAM = BiocParallel::SerialParam())
+
+assoc.sf.clean <- assoc.sf %>%
+  mutate(chr = if_else(chr == "U", "23", chr),
+         chr = as.numeric(chr)) %>%
+  rename(chrom = chr, pos = pos, p = Score.pval)
+
+
+## Manhattan plots 
+
+# s/f - no GWS
+qqman::manhattan(assoc.sf.clean, main = "S/F", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.sf.clean, title = "S/F", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# ppdmg - no GWS
+qqman::manhattan(assoc.ppdmg.clean, main = "PPD_MG", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.ppdmg.clean, title = "PPD_MG", ymin = 0, ymax = 10)
+
+# dist - no GWS
+qqman::manhattan(assoc.clean.dist, main = "Dist", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.dist, title = "Dist", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# maxCranElev - GWS!
+qqman::manhattan(assoc.clean.maxCranElev, main = "Max Cran Elev", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.maxCranElev, title = "Max Cran Elev", ymin = 0, ymax = 10)
+
+# maxDecel - GWS!
+qqman::manhattan(assoc.clean.maxDecel, main = "Max Decel", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.maxDecel, title = "Max Decel", ymin = 0, ymax = 10)
+
+# maxGape - no GWS
+qqman::manhattan(assoc.clean.maxGape, main = "Max Gape", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.maxGape, title = "Max Gape", ymin = 0, ymax = 10)
+
+# maxHD - no GWS
+qqman::manhattan(assoc.clean.maxHD, main = "Max HD", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.maxHD, title = "Max HD", ymin = 0, ymax = 10)
+
+# maxJP - no GWS
+qqman::manhattan(assoc.clean.maxJP, main = "Max JP", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.maxJP, title = "Max JP", ymin = 0, ymax = 10)
+
+# PPD_SI - no GWS
+qqman::manhattan(assoc.clean.PPD_SI, main = "PPD_SI", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.PPD_SI, title = "PPD_SI", ymin = 0, ymax = 10)
+
+# ramSpeed - no GWS
+qqman::manhattan(assoc.clean.ramSpeed, main = "Ram Speed", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.ramSpeed, title = "Ram Speed", ymin = 0, ymax = 10)
+
+# time_HDvMG - very close to GWS, worth investigating
+qqman::manhattan(assoc.clean.time_HDvMG, main = "Time - HD v MG", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.time_HDvMG, title = "Time - HD v MG", ymin = 0, ymax = 10)
+
+# time_maxDecelvMG - very close to GWS, worth investigating
+qqman::manhattan(assoc.clean.time_maxDecelvMG, main = "Time - Max Decel v MG", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.time_maxDecelvMG, title = "Time - Max Decel v MG", ymin = 0, ymax = 10)
+
+# ttpg - GWS!
+qqman::manhattan(assoc.clean.ttpg, main = "TTPG", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.ttpg, title = "TTPG", ymin = 0, ymax = 10)
+
+# sig or close to: maxCranElev, maxDecel, time_HDvMG, time_maxDecelvMG, ttpg
+
+manhattan(list(assoc.clean.maxCranElev, assoc.clean.maxDecel, assoc.clean.time_HDvMG, assoc.clean.time_maxDecelvMG, assoc.clean.ttpg), ntop = 3, size = 1.5, legend_labels = c("Max Cran Elev", "Max Decel", "Time HD vMG", "Time MaxDecelvMG", "TTPG"), ymin = -10, ymax = 10)
+
+
+# sig SNPs, or suggestive sig for the time variables 
+threshold <- 5E-8
+
+mce.sig <- assoc.clean.maxCranElev %>%
+  filter(p < threshold) 
+
+write_delim("gwas_grm_plots/mce.sig.csv", mce.sig, delim = ',')
+
+md.sig <- assoc.clean.maxDecel %>%
+  filter(p < threshold)
+
+write_delim("gwas_grm_plots/md.sig.csv", md.sig, delim = ',')
+
+time.hdvmg.sugg.sig <- assoc.clean.time_HDvMG %>%
+  filter(p < 1E-5)
+
+time.mdvmg.sugg.sig <- assoc.clean.time_maxDecelvMG %>%
+  filter(p < 1E-5)
+
+ttpg.sig <- assoc.clean.ttpg %>%
+  filter(p < threshold)
+
+
+#### Linkage Disequilibrium Analysis in SNPs with genome-wide significance
+
+# Read `.pvar` files in and save as new objects
+files.pvar <- c("maxCranElev", "maxDecel", "time_HDvMG", "time_maxDecelvMG", "ttpg")
+
+for (file in files.pvar) {
+  df <- read.table(paste0("gasAcu.plink.", file, ".pvar"), 
+                   header = F, 
+                   col.names = c("CHR", "POS", "ID", "REF", "ALT", "QUAL", "INFO")) %>%
     filter((CHR <= 22 | is.na(CHR))) %>%
     filter(CHR != 1.1 | is.na(CHR)) %>%
     filter(CHR != 21.1 | is.na(CHR)) %>%
-    mutate(CHR = replace_na(CHR, 23))
+    mutate(CHR = replace_na(CHR, 23)) %>%
+    dplyr::select(-c(QUAL, INFO)) %>%
+    rename(chrom = CHR, pos = POS, variant.id = ID,)
   
-  assign(name, data, envir = .GlobalEnv)
+  assign(paste0(file, ".pvar"), df, envir = .GlobalEnv)
 }
 
-# read in binary GWAS result
 
-sf <- read.table("gasAcu.plink.sf.glm.logistic", col.names = c("CHR",	"POS", "ID", "REF",	"ALT", "A1",	"TEST",	"OBS_CT",	"OR",	"LOG(OR)_SE",	"Z_STAT",	"P")) %>%
-  dplyr::select(CHR, POS, ID, P) %>%
-  filter((CHR <= 22 | is.na(CHR))) %>%
-  filter(CHR != 1.1 | is.na(CHR)) %>%
-  filter(CHR != 21.1 | is.na(CHR)) %>%
-  mutate(CHR = replace_na(CHR, 23))
+# Associate significant SNPs with `.pvar` files, extract the significant SNPs, and write out
 
+mce.sig.ann <- mce.sig %>% 
+  inner_join(maxCranElev.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  dplyr::select(variant.id) %>%
+  write_delim(., "mce_sig_snps.txt", delim = '\t')
 
-# make manhattan plots for each phenotype & pull SNP IDs with genome-wide significance
-## NB: blue (suggestive) line -log10(1E-5), red (genome-wide) line -log10(5E-8)
+md.sig.ann <- md.sig %>% 
+  inner_join(maxDecel.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  dplyr::select(variant.id) %>%
+  write_delim(., "md_sig_snps.txt", delim = '\t')
 
-threshold <- 5E-8
+time.hdvmg.sig.ann <- time.hdvmg.sugg.sig %>% 
+  inner_join(time_HDvMG.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  dplyr::select(variant.id) %>%
+  write_delim(., "time_hdvmg_sugg_sig_snps.txt", delim = '\t')
 
-manhattan(dist, main = "Dist", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no genome-wide sig (GWS)
+time.mdvmg.sig.ann <- time.mdvmg.sugg.sig %>% 
+  inner_join(time_HDvMG.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  dplyr::select(variant.id) %>%
+  write_delim(., "time_mdvmg_sugg_sig_snps.txt", delim = '\t')
 
-manhattan(maxCranElev, main = "Max Cran Elev", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # genome wide sig
-
-mce_sig <- maxCranElev %>%
-  filter(P < threshold)
-
-manhattan(maxDecel, main = "Max Decel", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # GWS
-
-md_sig <- maxDecel %>%
-  filter(P < threshold)
-
-manhattan(maxGape, main = "Max Gape", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no GWS
-
-manhattan(maxHD, main = "Max HD", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no GWS
-
-manhattan(maxJP, main = "Max JP", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no GWS
-
-manhattan(PPD_MG, main = "PPD_MG", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # GWS
-
-ppdmg_sig <- PPD_MG %>%
-  filter(P < threshold)
-
-manhattan(PPD_SI, main = "PPD SI", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no GWS
-
-manhattan(ramSpeed, main = "Ram Speed", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # GWS
-
-rs_sig <- ramSpeed %>%
-  filter(P < threshold)
-
-manhattan(sf, main = "Success/Failure", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # no GWS
-
-manhattan(time_HDvMG, main = "Time - HD v MG", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # GWS
-
-thdvmg_sig <- time_HDvMG %>%
-  filter(P < threshold)
-
-manhattan(ttpg, main = "TTPG", chr = "CHR", bp = "POS", p = "P", snp = "ID", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) # GWS
-
-ttpg_sig <- ttpg %>%
-  filter(P < threshold)
+ttpg.sig.ann <- ttpg.sig %>% 
+  inner_join(ttpg.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  dplyr::select(variant.id) %>%
+  write_delim(., "ttpg_sig_snps.txt", delim = '\t')
