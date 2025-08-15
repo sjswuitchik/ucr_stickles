@@ -44,3 +44,47 @@ ttpg.sig.ann <- ttpg.sig %>%
   inner_join(ttpg.pvar, by = c("chrom", "pos", "variant.id")) %>%
   dplyr::select(variant.id) %>%
   write_delim(., "ttpg_sig_snps.txt", delim = '\t')
+
+#### Make .BED for gene association
+mce_bed <- mce.sig %>% 
+  inner_join(maxCranElev.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  select(-c(REF, ALT, p)) %>%
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "mce") %>%
+  select(chrom, start, end, variant.id, pheno)
+
+md_bed <- md.sig %>% 
+  inner_join(maxDecel.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  select(-c(REF, ALT, p)) %>%
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "md") %>%
+  select(chrom, start, end, variant.id, pheno)
+
+thdvmg_bed <- time.hdvmg.sig %>% 
+  inner_join(time_HDvMG.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  select(-c(REF, ALT, p)) %>%
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "thdvmg") %>%
+  select(chrom, start, end, variant.id, pheno)
+
+tmdvmg_bed <- time.mdvmg.sugg.sig %>% 
+  inner_join(time_HDvMG.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  select(-c(REF, ALT, p)) %>%
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "tmdvmg") %>%
+  select(chrom, start, end, variant.id, pheno)
+
+ttpg_bed <- ttpg.sig %>% 
+  inner_join(ttpg.pvar, by = c("chrom", "pos", "variant.id")) %>%
+  select(-c(REF, ALT, p)) %>%
+  rename(end = pos) %>%
+  mutate(start = end - 1,
+         pheno = "ttpg") %>%
+  select(chrom, start, end, variant.id, pheno)
+
+clean_bed <- bind_rows(mce_bed, md_bed, thdvmg_bed, tmdvmg_bed, ttpg_bed)
+write_delim(clean_bed, "geneAssoc/cleanGenes.bed", delim = '\t', col_names = F)
