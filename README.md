@@ -7,6 +7,8 @@ Sara Smith (Assisant Professor, Mount Royal University)
 
 Seth Shirazi (Ph.D. candidate, University of California Riverside)
 
+Dina Navon (Assistant Professor, University of Fraser Valley)
+
 Tim Higham (Professor, University of California Riverside)
 
 Sean Rogers (Professor, University of Calgary; Director, Bamfield Marine Sciences Centre) 
