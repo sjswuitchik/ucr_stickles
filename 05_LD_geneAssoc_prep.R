@@ -108,24 +108,6 @@ ray.sig.ann <- ray.sig %>%
   dplyr::select(variant.id) %>%
   write_delim(., "gwas_out/ray_sig_snps.txt", delim = '\t')
 
-# LD matrix
-ray.ld.mat <- read.table("gwas_out/ray_ld_matrix.ld", header = F)
-rownames(ray.ld.mat) <- ray.sig.ann$variant.id
-colnames(ray.ld.mat) <- ray.sig.ann$variant.id
-
-ray.ld.long <- melt(as.matrix(ray.ld.mat), varnames = c("SNP_A", "SNP_B"), value.name = "R2")
-
-ggplot(ray.ld.long, aes(x = SNP_A, y = SNP_B, fill = R2)) +
-  geom_tile() +
-  scale_fill_viridis(option = "viridis") + 
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, size = 6),
-    axis.text.y = element_text(size = 6),
-    panel.grid = element_blank()
-  ) +
-  labs(title = "LD Heatmap (r²) Ray Count", x = "SNP", y = "SNP", fill = expression(r^2))
-
 ray_bed <- ray.sig %>% 
   inner_join(ray.pvar, by = c("chrom", "pos", "variant.id")) %>%
   select(-c(REF, ALT, p)) %>%
