@@ -25,3 +25,9 @@ mv gasAcu.plink* gwas_results/morph
 
 
 ## transfer files to comp to use GENESIS in R 
+
+## back for LD matrix
+# in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr/gwas_results/morph
+plink --bfile gasAcu.plink19.ray --extract ray_sig_snps.txt --r2 square --allow-extra-chr --out ray_ld_matrix
+
+## transfer to comp, continue in R
