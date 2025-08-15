@@ -3,9 +3,9 @@ This repository contains the code and associated data access for a collaboration
 
 Associated Investigators: 
 
-Seth Shirazi (Ph.D. candidate, University of California Riverside)
-
 Sara Smith (Assisant Professor, Mount Royal University) 
+
+Seth Shirazi (Ph.D. candidate, University of California Riverside)
 
 Tim Higham (Professor, University of California Riverside)
 
