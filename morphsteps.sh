@@ -1,7 +1,7 @@
 ## just trying to bang this out so it's not going to be organized in any way at all or run as a standalone script until I redo the repo and actually organize things. You've been warned 
 
 # in /home/sjsmith/projects/def-sjsmith/sjsmith/stickles_ucr
-conda activate gwas 
+conda activate vcfFilt
 
 # remove individuals that don't have morph phenos
 vcftools --vcf gasAcu.chrRename.final.recode.vcf --remove-indv dedup/BAM_18.dedup.bam --remove-indv dedup/BAM_59.dedup.bam --recode --recode-INFO-all --out gasAcu.chrRename.morph
