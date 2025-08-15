@@ -255,3 +255,136 @@ time.mdvmg.sugg.sig <- assoc.clean.time_maxDecelvMG %>%
 
 ttpg.sig <- assoc.clean.ttpg %>%
   filter(p < threshold)
+
+
+##########################
+## Morphological Traits ##
+##########################
+
+morph.phenos <- read_delim("~/Desktop/MRU_Faculty/Research/stickles_ucr/gwas_results/morphology/phenos/morph_phenos.tsv") %>%
+  rename(scanID = IID)
+
+scanAnnot.morph <- ScanAnnotationDataFrame(morph.phenos)
+
+morph <- c("length", "height", "eye.dia", "caudal.area", "pec.length", "pec.area", "ray")
+
+# make GDS function 
+make_gds <- function(pheno) { 
+  snpgdsBED2GDS(bed.fn = paste0("plink_out/gasAcu.plink19.", pheno, ".bed"),
+                bim.fn = paste0("plink_out/gasAcu.plink19.", pheno, ".bim"),
+                fam.fn = paste0("plink_out/gasAcu.plink19.", pheno, ".fam"),
+                out.gdsfn = paste0("plink_out/", pheno, ".gds"),
+                cvt.chr = "char")
+}
+
+for (pheno in morph) {
+  make_gds(pheno)
+}
+
+# create KING matrices & geno data
+create_geno <- function(pheno) {
+  geno <- GdsGenotypeReader(filename = paste0("plink_out/", pheno, ".gds"))
+  genoData <- GenotypeData(geno)
+  assign(paste0("genoData.", pheno), genoData, envir = .GlobalEnv)
+}
+
+for (pheno in morph) {
+  create_geno(pheno)
+}
+
+# create regularization function becuase otherwise nothing works (need positive definite matrix)
+regularize_matrix <- function(K, lambda = 0.01) {
+  (1 - lambda) * K + lambda * diag(nrow(K))
+}
+
+# create KING matrix
+create_kin <- function(pheno) {
+  gds <- snpgdsOpen(paste0("plink_out/", pheno, ".gds"), readonly = F, allow.duplicate = T)
+  kin <- snpgdsIBDKING(gds)
+  kin.mat <- kingToMatrix(kin)
+  assign(paste0("kin.mat.", pheno), kin.mat, envir = .GlobalEnv)
+  snpgdsClose(gds)
+}
+
+for (pheno in morph) {
+  create_kin(pheno)
+  kin.mat <- get(paste0("kin.mat.", pheno))
+  kin.mat.reg <- regularize_matrix(kin.mat, lambda = 0.05)  # adjust lambda as needed
+  assign(paste0("kin.mat.", pheno), kin.mat.reg, envir = .GlobalEnv)
+}
+
+
+# create null models 
+for (pheno in morph) {
+  kin_name <- paste0("kin.mat.", pheno)
+  null_mod <- fitNullModel(
+    scanAnnot.morph,
+    outcome = pheno,
+    cov.mat = get(kin_name),
+    family = "gaussian"
+  )
+  
+  assign(paste0("null.mod.", pheno), null_mod, envir = .GlobalEnv)
+}
+
+# run GWAS 
+for (pheno in morph) {
+  geno_data <- get(paste0("genoData.", pheno))
+  genoIterator <- GenotypeBlockIterator(geno_data, snpBlock = 10000)
+  assoc <- assocTestSingle(genoIterator, null.model = get(paste0("null.mod.", pheno)), BPPARAM = BiocParallel::SerialParam())
+  
+  assign(paste0("assoc.", pheno), assoc, envir = .GlobalEnv)
+  
+  assoc_clean <- assoc %>%
+    mutate(chr = if_else(chr == "U", "23", chr),
+           chr = as.numeric(chr)) %>%
+    rename(chrom = chr, pos = pos, p = Score.pval)
+  
+  assign(paste0("assoc.clean.", pheno), assoc_clean, envir = .GlobalEnv)
+  
+  
+}
+
+# Manhattans
+# length
+qqman::manhattan(assoc.clean.length, main = "Standard Length", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.length, title = "Std Length", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# height 
+qqman::manhattan(assoc.clean.height, main = "Height", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.height, title = "Height", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# eye diameter
+qqman::manhattan(assoc.clean.eye.dia, main = "Eye Diameter", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.eye.dia, title = "Eye Diameter", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# caudal fin area
+qqman::manhattan(assoc.clean.caudal.area, main = "Caudal Fin Area", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.caudal.area, title = "Caudal Fin Area", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# pec fin length
+qqman::manhattan(assoc.clean.pec.length, main = "Pec Fin Length", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.pec.length, title = "Pec Fin Length", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# pec fin area
+qqman::manhattan(assoc.clean.pec.area, main = "Pec Fin Area", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.pec.area, title = "Pec Fin Area", annotate = 1e-5, ymin = 0, ymax = 10)
+
+# ray count - only pheno with GWS
+qqman::manhattan(assoc.clean.ray, main = "Ray Count", chr = "chrom", bp = "pos", p = "p", snp = "variant.id", ylim = c(0, 10), chrlabs = c(1:21, "Y", "MT"), col = c("skyblue", "grey")) 
+
+manhattan(assoc.clean.ray, title = "Ray Count", ymin = 0, ymax = 10)
+
+# only dealing with ray count from here on out
+threshold <- 5E-8
+
+ray.sig <- assoc.clean.ray %>%
+  filter(p < threshold) 
+
+write.table(ray.sig, "gwas_out/ray.sig.csv", row.names = F, sep = ',')
