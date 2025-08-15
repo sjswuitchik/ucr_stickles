@@ -23,3 +23,16 @@ snpList <- gene_clean %>%
   distinct(gene)
 
 write_delim(snpList, "geneAssoc/snpList", delim = "\t", col_names = F)
+
+## PANTHER interlude
+
+list <- read_excel("geneAssoc/geneAssoc.xlsx")
+
+panther <- read_delim("geneAssoc/pantherGeneList_full.txt", col_names = F) %>%
+  rename(gene = "X2", sum = "X3", ref = "X6") %>%
+  select(gene, sum, ref) %>%
+  separate(sum, into = c("summary", NA), sep = ';', extra = "drop")
+
+cleanList <- full_join(list, panther, by = "gene", relationship = "many-to-many") %>%
+  mutate(ref = if_else(is.na(ref), "Homo sapiens", ref))
+write_delim(cleanList, "geneAssoc/table_geneAssoc.tsv", delim = "\t")
